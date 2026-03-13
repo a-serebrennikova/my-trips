@@ -12,6 +12,8 @@ async function main() {
     data: {
       id: "u1",
       name: "Анастасия",
+      email: "anastasia@example.com",
+      password: "password123",
       avatarColor: "#2563eb",
       homeCity: "Москва",
     },
@@ -21,6 +23,8 @@ async function main() {
     data: {
       id: "u2",
       name: "Иван",
+      email: "ivan@example.com",
+      password: "password123",
       avatarColor: "#0ea5e9",
       homeCity: "Санкт‑Петербург",
     },
@@ -30,6 +34,8 @@ async function main() {
     data: {
       id: "u3",
       name: "Мария",
+      email: "maria@example.com",
+      password: "password123",
       avatarColor: "#6366f1",
       homeCity: "Казань",
     },
@@ -55,9 +61,27 @@ async function main() {
       createdAt: "2025-04-20T10:00:00.000Z",
       places: {
         create: [
-          { id: "p1", name: "Голубая мечеть", city: "Стамбул", note: "Лучше приходить к открытию, пока мало людей.", type: "attraction" },
-          { id: "p2", name: "Галатская башня", city: "Стамбул", note: "Закат на смотровой площадке — must have.", type: "attraction" },
-          { id: "c1", name: "Cafe Privato", city: "Стамбул", note: "Вкусные завтраки с видом на Галатский мост.", type: "cafe" },
+          {
+            id: "p1",
+            name: "Голубая мечеть",
+            city: "Стамбул",
+            note: "Лучше приходить к открытию, пока мало людей.",
+            type: "attraction",
+          },
+          {
+            id: "p2",
+            name: "Галатская башня",
+            city: "Стамбул",
+            note: "Закат на смотровой площадке — must have.",
+            type: "attraction",
+          },
+          {
+            id: "c1",
+            name: "Cafe Privato",
+            city: "Стамбул",
+            note: "Вкусные завтраки с видом на Галатский мост.",
+            type: "cafe",
+          },
         ],
       },
       comments: {
@@ -94,8 +118,20 @@ async function main() {
       createdAt: "2025-01-15T12:00:00.000Z",
       places: {
         create: [
-          { id: "p3", name: "Суоменлинна", city: "Хельсинки", note: "Прогулка по крепости и море льда вокруг.", type: "attraction" },
-          { id: "c2", name: "Cafe Regatta", city: "Хельсинки", note: "Очень атмосферное место на берегу залива.", type: "cafe" },
+          {
+            id: "p3",
+            name: "Суоменлинна",
+            city: "Хельсинки",
+            note: "Прогулка по крепости и море льда вокруг.",
+            type: "attraction",
+          },
+          {
+            id: "c2",
+            name: "Cafe Regatta",
+            city: "Хельсинки",
+            note: "Очень атмосферное место на берегу залива.",
+            type: "cafe",
+          },
         ],
       },
       likes: {
@@ -124,8 +160,20 @@ async function main() {
       createdAt: "2025-05-06T18:30:00.000Z",
       places: {
         create: [
-          { id: "p4", name: "Старый город Ичеришехер", city: "Баку", note: "Лучше гулять без карты и просто теряться в улочках.", type: "attraction" },
-          { id: "c3", name: "Чайхана в старом городе", city: "Баку", note: "Чай с пахлавой и видом на улицы.", type: "cafe" },
+          {
+            id: "p4",
+            name: "Старый город Ичеришехер",
+            city: "Баку",
+            note: "Лучше гулять без карты и просто теряться в улочках.",
+            type: "attraction",
+          },
+          {
+            id: "c3",
+            name: "Чайхана в старом городе",
+            city: "Баку",
+            note: "Чай с пахлавой и видом на улицы.",
+            type: "cafe",
+          },
         ],
       },
       comments: {

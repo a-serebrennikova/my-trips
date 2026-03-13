@@ -1,36 +1,122 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# myTrips — твои путешествия и друзья
 
-## Getting Started
+Личный дневник путешествий: города, впечатления, заметки и путешествия друзей.
 
-First, run the development server:
+## Оглавление
+
+- [Технологии проекта](./docs/technologies.md)
+- [Логика приложения](./docs/application_logic.md)
+- [Команды проекта](./docs/commands.md)
+- [API эндпоинты](./docs/api_endpoints.md)
+- [Схема базы данных](./docs/database_schema.md)
+
+## Описание проекта
+
+myTrips — это веб-приложение для ведения личного дневника путешествий. Пользователи могут создавать записи о своих поездках, делиться ими с друзьями, оставлять комментарии и ставить лайки.
+
+### Основные возможности
+
+- Создание и управление записями о путешествиях
+- Добавление фотографий, заметок и оценок
+- Просмотр путешествий друзей
+- Комментирование и лайки
+- Фильтрация и сортировка по различным критериям
+- Персональный профиль пользователя
+
+### Стек технологий
+
+- **Frontend**: Next.js 16.1.6, React 19.2.3, TypeScript
+- **Styling**: Tailwind CSS, Radix UI Themes
+- **State Management**: Zustand
+- **Backend**: Next.js API Routes
+- **Database**: SQLite, Prisma ORM
+- **Validation**: Zod
+
+## Установка и запуск
+
+1. Клонируйте репозиторий:
+
+```bash
+git clone <url>
+cd my-trips
+```
+
+2. Установите зависимости:
+
+```bash
+npm install
+```
+
+3. Настройте переменные окружения (при необходимости):
+
+```bash
+cp .env.example .env.local
+```
+
+4. Сгенерируйте Prisma клиента:
+
+```bash
+npm run db:generate
+```
+
+5. Примените схему к базе данных:
+
+```bash
+npm run db:push
+```
+
+6. Заполните базу тестовыми данными (необязательно, но рекомендуется для первого запуска):
+
+```bash
+npm run db:seed
+```
+
+Эта команда заполнит базу данных начальными тестовыми данными, включая 3 пользователей (Анастасия, Иван, Мария) с их путешествиями, комментариями, лайками и посещенными местами. После выполнения команды вы сможете сразу протестировать все функции приложения с реальными примерами данных.
+
+7. Запустите приложение в режиме разработки:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Приложение будет доступно по адресу http://localhost:3000
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Структура проекта
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+my-trips/
+├── app/                    # Основные страницы приложения
+│   ├── api/                # API маршруты
+│   │   └── travel/         # API для путешествий
+│   ├── favorites/          # Страница избранного
+│   ├── friends/            # Страница друзей
+│   ├── login/              # Страница входа
+│   ├── me/                 # Страница профиля пользователя
+│   ├── trips/              # Страницы путешествий
+│   │   └── [tripId]/       # Страница конкретного путешествия
+│   ├── layout.tsx          # Общий макет приложения
+│   └── page.tsx            # Главная страница
+├── components/             # Переиспользуемые компоненты
+│   ├── friends/            # Компоненты для друзей
+│   ├── login/              # Компоненты для авторизации
+│   ├── main/               # Основные компоненты
+│   └── trip/               # Компоненты для путешествий
+├── docs/                   # Документация проекта
+├── lib/                    # Вспомогательные библиотеки и функции
+├── prisma/                 # Конфигурация Prisma и сиды
+└── public/                 # Публичные ресурсы
+```
 
-## Learn More
+## Документация
 
-To learn more about Next.js, take a look at the following resources:
+Подробная документация по различным аспектам проекта доступна в следующих файлах:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- [Технологии проекта](./docs/technologies.md) - описание используемых технологий и архитектурных решений
+- [Логика приложения](./docs/application_logic.md) - описание бизнес-логики и условий отображения
+- [Команды проекта](./docs/commands.md) - список всех доступных команд и их использование
+- [API эндпоинты](./docs/api_endpoints.md) - описание всех API маршрутов и их использование
+- [Схема базы данных](./docs/database_schema.md) - описание структуры базы данных и связей между моделями
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Команда разработчиков
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Этот проект создан как pet-проект для демонстрации возможностей современных веб-технологий.

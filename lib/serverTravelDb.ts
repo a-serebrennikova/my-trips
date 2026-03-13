@@ -16,16 +16,38 @@ function mapDbTripToTrip(db: {
   coverImage: string;
   notes: string | null;
   createdAt: string;
-  places: { id: string; name: string; city: string; note: string | null; type: string }[];
-  comments: { id: string; tripId: string; authorId: string; message: string; createdAt: string }[];
+  places: {
+    id: string;
+    name: string;
+    city: string;
+    note: string | null;
+    type: string;
+  }[];
+  comments: {
+    id: string;
+    tripId: string;
+    authorId: string;
+    message: string;
+    createdAt: string;
+  }[];
   likes: { userId: string }[];
 }): Trip {
   const attractions: Place[] = db.places
     .filter((p) => p.type === "attraction")
-    .map((p) => ({ id: p.id, name: p.name, city: p.city, note: p.note ?? undefined }));
+    .map((p) => ({
+      id: p.id,
+      name: p.name,
+      city: p.city,
+      note: p.note ?? undefined,
+    }));
   const cafes: Place[] = db.places
     .filter((p) => p.type === "cafe")
-    .map((p) => ({ id: p.id, name: p.name, city: p.city, note: p.note ?? undefined }));
+    .map((p) => ({
+      id: p.id,
+      name: p.name,
+      city: p.city,
+      note: p.note ?? undefined,
+    }));
   const comments: Comment[] = db.comments.map((c) => ({
     id: c.id,
     tripId: c.tripId,
@@ -57,16 +79,27 @@ function mapDbTripToTrip(db: {
   };
 }
 
-function mapDbUserToUser(db: { id: string; name: string; avatarColor: string; homeCity: string }): User {
+function mapDbUserToUser(db: {
+  id: string;
+  name: string;
+  email: string;
+  password: string;
+  avatarColor: string;
+  homeCity: string;
+}): User {
   return {
     id: db.id,
     name: db.name,
+    email: db.email,
+    password: db.password,
     avatarColor: db.avatarColor,
     homeCity: db.homeCity,
   };
 }
 
-export async function getUserTravelData(userId: string): Promise<{ trips: Trip[] }> {
+export async function getUserTravelData(
+  userId: string,
+): Promise<{ trips: Trip[] }> {
   const dbTrips = await prisma.trip.findMany({
     where: { userId },
     include: { places: true, comments: true, likes: true },
@@ -77,7 +110,10 @@ export async function getUserTravelData(userId: string): Promise<{ trips: Trip[]
   };
 }
 
-export async function getAllTravelData(): Promise<{ users: User[]; trips: Trip[] }> {
+export async function getAllTravelData(): Promise<{
+  users: User[];
+  trips: Trip[];
+}> {
   const [users, dbTrips] = await Promise.all([
     prisma.user.findMany(),
     prisma.trip.findMany({
@@ -150,7 +186,10 @@ export async function createTrip(
   return mapDbTripToTrip(db);
 }
 
-export async function updateTrip(tripId: string, patch: Partial<Trip>): Promise<Trip | null> {
+export async function updateTrip(
+  tripId: string,
+  patch: Partial<Trip>,
+): Promise<Trip | null> {
   const existing = await prisma.trip.findUnique({
     where: { id: tripId },
     include: { places: true, comments: true, likes: true },
@@ -164,7 +203,8 @@ export async function updateTrip(tripId: string, patch: Partial<Trip>): Promise<
   if (patch.startDate != null) updateData.startDate = patch.startDate;
   if (patch.endDate != null) updateData.endDate = patch.endDate;
   if (patch.days != null) updateData.days = patch.days;
-  if (patch.approximateCost != null) updateData.approximateCost = patch.approximateCost;
+  if (patch.approximateCost != null)
+    updateData.approximateCost = patch.approximateCost;
   if (patch.currency != null) updateData.currency = patch.currency;
   if (patch.rating != null) updateData.rating = patch.rating;
   if (patch.coverImage != null) updateData.coverImage = patch.coverImage;
@@ -172,14 +212,19 @@ export async function updateTrip(tripId: string, patch: Partial<Trip>): Promise<
 
   if (patch.attractions != null || patch.cafes != null) {
     await prisma.place.deleteMany({ where: { tripId } });
-    const attractions = (patch.attractions ?? existing.places.filter((p) => p.type === "attraction")).map((p) => ({
+    const attractions = (
+      patch.attractions ??
+      existing.places.filter((p) => p.type === "attraction")
+    ).map((p) => ({
       id: p.id,
       name: p.name,
       city: p.city,
       note: p.note,
       type: "attraction" as const,
     }));
-    const cafes = (patch.cafes ?? existing.places.filter((p) => p.type === "cafe")).map((p) => ({
+    const cafes = (
+      patch.cafes ?? existing.places.filter((p) => p.type === "cafe")
+    ).map((p) => ({
       id: p.id,
       name: p.name,
       city: p.city,
@@ -236,7 +281,10 @@ export async function createComment(
   };
 }
 
-export async function toggleTripLike(tripId: string, userId: string): Promise<Trip | undefined> {
+export async function toggleTripLike(
+  tripId: string,
+  userId: string,
+): Promise<Trip | undefined> {
   const existing = await prisma.tripLike.findUnique({
     where: { tripId_userId: { tripId, userId } },
   });
