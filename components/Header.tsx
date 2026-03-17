@@ -52,7 +52,6 @@ export function Header() {
         </button>
 
         <nav className="hidden items-center gap-2 sm:flex">
-          <NavLink href="/me" label="Мой профиль" />
           <NavLink href="/trips" label="Путешествия" />
           <NavLink href="/favorites" label="Избранное" />
           <NavLink href="/friends" label="Друзья" />
@@ -62,7 +61,7 @@ export function Header() {
           {currentUser ? (
             <button
               type="button"
-              onClick={() => router.push("/profile")}
+              onClick={() => router.push("/me")}
               className="flex items-center gap-2 rounded-full bg-white/95 px-3 py-1.5 text-xs font-medium text-sky-800 shadow-sm hover:bg-white"
             >
               <span
