@@ -8,10 +8,10 @@ import Link from "next/link";
 import { RedirectLink } from "@/components/main/RedirectLink";
 
 export default async function Home() {
-  const snapshot = await fetchTravelData();
+  const snapshot = await fetchTravelData(3, 0); // Загружаем только 3 последние поездки
   const { users, trips } = snapshot;
 
-  const topTrips = trips.slice(0, 3);
+  const topTrips = trips;
 
   return (
     <div className="grid gap-6 md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] md:items-stretch">

@@ -2,7 +2,7 @@ import { TripCard } from "../../components/trip/TripCard";
 import { fetchTravelData } from "../../lib/travelApi";
 
 export default async function TripsPage() {
-  const snapshot = await fetchTravelData();
+  const snapshot = await fetchTravelData(20, 0); // Загружаем первые 20 поездок
   const { users, trips } = snapshot;
 
   return (

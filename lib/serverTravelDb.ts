@@ -110,20 +110,28 @@ export async function getUserTravelData(
   };
 }
 
-export async function getAllTravelData(): Promise<{
+export async function getAllTravelData(
+  limit: number = 10,
+  offset: number = 0,
+): Promise<{
   users: User[];
   trips: Trip[];
+  totalTrips: number;
 }> {
-  const [users, dbTrips] = await Promise.all([
+  const [users, dbTrips, totalTrips] = await Promise.all([
     prisma.user.findMany(),
     prisma.trip.findMany({
+      skip: offset,
+      take: limit,
       include: { places: true, comments: true, likes: true },
       orderBy: { createdAt: "desc" },
     }),
+    prisma.trip.count(),
   ]);
   return {
     users: users.map(mapDbUserToUser),
     trips: dbTrips.map(mapDbTripToTrip),
+    totalTrips,
   };
 }
 
@@ -190,12 +198,13 @@ export async function updateTrip(
   tripId: string,
   patch: Partial<Trip>,
 ): Promise<Trip | null> {
+  // Проверяем, существует ли поездка
   const existing = await prisma.trip.findUnique({
     where: { id: tripId },
-    include: { places: true, comments: true, likes: true },
+    select: { id: true }, // Выбираем только ID для проверки существования
   });
-  if (!existing) return null;
 
+  if (!existing) return null;
   const updateData: Record<string, unknown> = {};
   if (patch.title != null) updateData.title = patch.title;
   if (patch.city != null) updateData.city = patch.city;
@@ -210,27 +219,28 @@ export async function updateTrip(
   if (patch.coverImage != null) updateData.coverImage = patch.coverImage;
   if (patch.notes != null) updateData.notes = patch.notes;
 
+  // Если обновляются места, то сначала удаляем старые и создаем новые
   if (patch.attractions != null || patch.cafes != null) {
     await prisma.place.deleteMany({ where: { tripId } });
-    const attractions = (
-      patch.attractions ??
-      existing.places.filter((p) => p.type === "attraction")
-    ).map((p) => ({
-      id: p.id,
-      name: p.name,
-      city: p.city,
-      note: p.note,
-      type: "attraction" as const,
-    }));
-    const cafes = (
-      patch.cafes ?? existing.places.filter((p) => p.type === "cafe")
-    ).map((p) => ({
-      id: p.id,
-      name: p.name,
-      city: p.city,
-      note: p.note,
-      type: "cafe" as const,
-    }));
+
+    const attractions =
+      patch.attractions?.map((p) => ({
+        id: p.id,
+        name: p.name,
+        city: p.city || patch.city || "",
+        note: p.note,
+        type: "attraction" as const,
+      })) || [];
+
+    const cafes =
+      patch.cafes?.map((p) => ({
+        id: p.id,
+        name: p.name,
+        city: p.city || patch.city || "",
+        note: p.note,
+        type: "cafe" as const,
+      })) || [];
+
     await prisma.place.createMany({
       data: [...attractions, ...cafes].map((p) => ({
         id: p.id,
@@ -248,6 +258,8 @@ export async function updateTrip(
     data: updateData,
     include: { places: true, comments: true, likes: true },
   });
+
+  if (!db) return null;
 
   return mapDbTripToTrip(db);
 }

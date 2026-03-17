@@ -3,16 +3,23 @@ import type { User, Trip, Comment } from "./travelStore";
 export type TravelSnapshot = {
   users: User[];
   trips: Trip[];
+  totalTrips: number;
 };
 
 const BASE_URL = process.env.NEXT_URL ?? "http://localhost:3000";
 
-export async function fetchTravelData(): Promise<TravelSnapshot> {
-  const response = await fetch(`${BASE_URL}/api/travel`, {
-    method: "GET",
-    headers: { "Content-Type": "application/json" },
-    next: { tags: ["travelData"] },
-  });
+export async function fetchTravelData(
+  limit: number = 10,
+  offset: number = 0,
+): Promise<TravelSnapshot> {
+  const response = await fetch(
+    `${BASE_URL}/api/travel?limit=${limit}&offset=${offset}`,
+    {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+      next: { tags: ["travelData"] },
+    },
+  );
   if (!response.ok) {
     throw new Error("Не удалось загрузить данные о путешествиях");
   }

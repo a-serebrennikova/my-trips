@@ -12,6 +12,8 @@ export default async function MePage() {
     name: "Анастасия",
     avatarColor: "#2563eb",
     homeCity: "Москва",
+    password: '',
+    email: ''
   }; //useAuthStore((state) => state.currentUser);
 
   const { trips } = await fetchUserData(currentUser.id);
