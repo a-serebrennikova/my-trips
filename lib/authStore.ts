@@ -1,6 +1,6 @@
 import { create } from "zustand";
+import { persist } from "zustand/middleware";
 import type { User } from "./travelStore";
-import { devtools } from "zustand/middleware";
 
 type AuthState = {
   currentUser?: User;
@@ -9,9 +9,14 @@ type AuthState = {
 };
 
 export const useAuthStore = create<AuthState>()(
-  devtools((set) => ({
-    currentUser: undefined,
-    setCurrentUser: (user) => set({ currentUser: user }),
-    clearCurrentUser: () => set({ currentUser: undefined }),
-  })),
+  persist(
+    (set) => ({
+      currentUser: undefined,
+      setCurrentUser: (user) => set({ currentUser: user }),
+      clearCurrentUser: () => set({ currentUser: undefined }),
+    }),
+    {
+      name: "auth-storage",
+    },
+  ),
 );

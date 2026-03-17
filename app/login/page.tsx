@@ -1,6 +1,6 @@
 import { fetchTravelData } from "../../lib/travelApi";
 import Link from "next/link";
-import { CurrentUser } from "@/components/login/CurrentUser";
+import { LoginForm } from "@/components/login/LoginForm";
 
 export default async function LoginPage() {
   const { users } = await fetchTravelData();
@@ -18,21 +18,29 @@ export default async function LoginPage() {
           АВТОРИЗАЦИЯ
         </p>
         <h1 className="text-xl font-semibold tracking-tight text-slate-900 sm:text-2xl">
-          Выбери, под кем войти
+          Вход в аккаунт
         </h1>
         <p className="max-w-md text-sm text-slate-600">
-          На демо-версии приложения авторизация работает через выбор
-          пользователя. Позже здесь может быть настоящая регистрация и логин.
+          Введите email и пароль для входа в систему. Для демо-версии
+          используйте данные из списка ниже.
         </p>
       </header>
 
-      {
-        <div className="grid gap-3 sm:grid-cols-3">
+      <div className="rounded-xl bg-slate-50 p-4">
+        <p className="text-xs font-medium text-slate-600 mb-2">
+          Демо пользователи:
+        </p>
+        <div className="space-y-1 text-xs text-slate-500">
           {users.map((user) => (
-            <CurrentUser user={user} key={user.id} />
+            <p key={user.id}>
+              <span className="font-medium text-slate-700">{user.email}</span> /{" "}
+              {user.password}
+            </p>
           ))}
         </div>
-      }
+      </div>
+
+      <LoginForm users={users} />
     </div>
   );
 }
