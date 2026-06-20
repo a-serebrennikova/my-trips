@@ -1,122 +1,27 @@
-# myTrips — твои путешествия и друзья
+# myTrips — your travel diary
 
-Личный дневник путешествий: города, впечатления, заметки и путешествия друзей.
+This project was built as a learning exercise using Next.js, Tailwind CSS, Prisma, and Cursor & Cloude.
+A personal travel diary web application for logging trips, notes, photos, and sharing experiences with friends.
 
-## Оглавление
+## Project Overview
 
-- [Технологии проекта](./docs/technologies.md)
-- [Логика приложения](./docs/application_logic.md)
-- [Команды проекта](./docs/commands.md)
-- [API эндпоинты](./docs/api_endpoints.md)
-- [Схема базы данных](./docs/database_schema.md)
+myTrips is a web app for keeping a personal travel diary. Users can create trip entries, add photos and notes, share trips with friends, comment, and like.
 
-## Описание проекта
+## Features
 
-myTrips — это веб-приложение для ведения личного дневника путешествий. Пользователи могут создавать записи о своих поездках, делиться ими с друзьями, оставлять комментарии и ставить лайки.
+- Create and manage trip entries
+- Add photos, notes, and ratings
+- View friends' trips
+- Comment and like entries
+- Filter and sort trips by various criteria
+- Personal user profile
 
-### Основные возможности
+## Table of contents
 
-- Создание и управление записями о путешествиях
-- Добавление фотографий, заметок и оценок
-- Просмотр путешествий друзей
-- Комментирование и лайки
-- Фильтрация и сортировка по различным критериям
-- Персональный профиль пользователя
-
-### Стек технологий
-
-- **Frontend**: Next.js 16.1.6, React 19.2.3, TypeScript
-- **Styling**: Tailwind CSS, Radix UI Themes
-- **State Management**: Zustand
-- **Backend**: Next.js API Routes
-- **Database**: SQLite, Prisma ORM
-- **Validation**: Zod
-
-## Установка и запуск
-
-1. Клонируйте репозиторий:
-
-```bash
-git clone <url>
-cd my-trips
-```
-
-2. Установите зависимости:
-
-```bash
-npm install
-```
-
-3. Настройте переменные окружения (при необходимости):
-
-```bash
-cp .env.example .env.local
-```
-
-4. Сгенерируйте Prisma клиента:
-
-```bash
-npm run db:generate
-```
-
-5. Примените схему к базе данных:
-
-```bash
-npm run db:push
-```
-
-6. Заполните базу тестовыми данными (необязательно, но рекомендуется для первого запуска):
-
-```bash
-npm run db:seed
-```
-
-Эта команда заполнит базу данных начальными тестовыми данными, включая 3 пользователей (Анастасия, Иван, Мария) с их путешествиями, комментариями, лайками и посещенными местами. После выполнения команды вы сможете сразу протестировать все функции приложения с реальными примерами данных.
-
-7. Запустите приложение в режиме разработки:
-
-```bash
-npm run dev
-```
-
-Приложение будет доступно по адресу http://localhost:3000
-
-## Структура проекта
-
-```
-my-trips/
-├── app/                    # Основные страницы приложения
-│   ├── api/                # API маршруты
-│   │   └── travel/         # API для путешествий
-│   ├── favorites/          # Страница избранного
-│   ├── friends/            # Страница друзей
-│   ├── login/              # Страница входа
-│   ├── me/                 # Страница профиля пользователя
-│   ├── trips/              # Страницы путешествий
-│   │   └── [tripId]/       # Страница конкретного путешествия
-│   ├── layout.tsx          # Общий макет приложения
-│   └── page.tsx            # Главная страница
-├── components/             # Переиспользуемые компоненты
-│   ├── friends/            # Компоненты для друзей
-│   ├── login/              # Компоненты для авторизации
-│   ├── main/               # Основные компоненты
-│   └── trip/               # Компоненты для путешествий
-├── docs/                   # Документация проекта
-├── lib/                    # Вспомогательные библиотеки и функции
-├── prisma/                 # Конфигурация Prisma и сиды
-└── public/                 # Публичные ресурсы
-```
-
-## Документация
-
-Подробная документация по различным аспектам проекта доступна в следующих файлах:
-
-- [Технологии проекта](./docs/technologies.md) - описание используемых технологий и архитектурных решений
-- [Логика приложения](./docs/application_logic.md) - описание бизнес-логики и условий отображения
-- [Команды проекта](./docs/commands.md) - список всех доступных команд и их использование
-- [API эндпоинты](./docs/api_endpoints.md) - описание всех API маршрутов и их использование
-- [Схема базы данных](./docs/database_schema.md) - описание структуры базы данных и связей между моделями
-
-## Команда разработчиков
-
-Этот проект создан как pet-проект для демонстрации возможностей современных веб-технологий.
+- [Project Overview](#project-overview)
+- [Stack](./docs/stack.md)
+- [Project Structure](./docs/project_structure.md)
+- [Documentation](./docs/documentation.md)
+- [Installation & Run](#installation--run)
+- [Features](#features)
+- [Installation & Run](docs/installation.md)
