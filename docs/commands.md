@@ -1,128 +1,106 @@
-# Команды проекта
+# Project commands
 
-## Установка зависимостей
+## Install dependencies
 
 ```bash
 npm install
 ```
 
-Установка всех необходимых зависимостей проекта, указанных в package.json.
+Install project dependencies defined in `package.json`.
 
-## Запуск приложения
+## Run the app
 
-### Разработка
+### Development
 
 ```bash
 npm run dev
 ```
 
-Запуск приложения в режиме разработки с горячей перезагрузкой. Приложение будет доступно по адресу http://localhost:3000.
+Run the app in development mode with hot reload. The app will be available at http://localhost:3000.
 
-### Сборка
+### Build
 
 ```bash
 npm run build
 ```
 
-Создание оптимизированной сборки приложения для продакшена.
+Create an optimized production build.
 
-### Запуск продакшен-версии
+### Start (production)
 
 ```bash
 npm run start
 ```
 
-Запуск скомпилированного приложения в продакшен-режиме.
+Start the compiled production build.
 
-## Работа с базой данных
+## Database tasks
 
-### Генерация Prisma клиента
+### Generate Prisma client
 
 ```bash
 npm run db:generate
 ```
 
-Генерация TypeScript типов на основе схемы Prisma. Необходимо запускать после изменений в schema.prisma.
+Generate TypeScript types based on the Prisma schema. Run after changes to `schema.prisma`.
 
-### Применение изменений схемы
+### Apply schema changes
 
 ```bash
 npm run db:push
 ```
 
-Применение изменений из schema.prisma к базе данных без создания миграции. Полезно в процессе разработки.
+Apply `schema.prisma` changes to the database without creating a migration (useful during development).
 
-### Заполнение базы тестовыми данными
+### Seed the database
 
 ```bash
 npm run db:seed
 ```
 
-Запуск сидера для заполнения базы данных начальными тестовыми данными из файла prisma/seed.ts. Этот скрипт создаст 3 пользователей (Анастасия, Иван, Мария) с их путешествиями, комментариями, лайками и посещенными местами.
+Populate the database with initial test data from `prisma/seed.ts`. The seeder creates 3 users with example trips, comments, likes, and visited places.
 
-После выполнения команды в базе данных будут созданы:
+After running the command the database will contain:
 
-- 3 пользователя с уникальными именами и цветами аватаров
-- 3 путешествия с подробной информацией (название, даты, стоимость, рейтинг, заметки)
-- Места посещения (достопримечательности и кафе) для каждого путешествия
-- Комментарии пользователей к путешествиям
-- Лайки, проставленные пользователями к путешествиям
+- 3 users with unique names and avatar colors
+- 3 trips with detailed information (title, dates, cost, rating, notes)
+- Places (attractions and cafes) for each trip
+- Comments from users on trips
+- Likes applied by users to trips
 
-### Открытие Prisma Studio
+### Open Prisma Studio
 
 ```bash
 npm run db:studio
 ```
 
-Открытие графического интерфейса для просмотра и редактирования данных в базе данных.
+Open the browser-based Prisma Studio to view and edit database records.
 
-## Дополнительные команды
+## Additional commands
 
-### Линтинг
+### Linting
 
 ```bash
 npm run lint
 ```
 
-Проверка кода на соответствие установленным правилам ESLint.
+Run ESLint to check code quality.
 
-## Структура команд
+## Scripts overview
 
-Все команды определены в файле `package.json` в секции `scripts`:
+All scripts are defined under `scripts` in `package.json`:
 
-- `dev`: Запуск Next.js в режиме разработки
-- `build`: Сборка приложения для продакшена
-- `start`: Запуск продакшен-сборки
-- `lint`: Проверка кода с помощью ESLint
-- `db:generate`: Генерация Prisma клиента
-- `db:push`: Применение изменений схемы к базе данных
-- `db:seed`: Заполнение базы данных тестовыми данными
-- `db:studio`: Открытие Prisma Studio
+- `dev`: Start Next.js in development mode
+- `build`: Build the app for production
+- `start`: Run the production build
+- `lint`: Run ESLint
+- `db:generate`: Generate Prisma client
+- `db:push`: Apply Prisma schema changes
+- `db:seed`: Seed the database
+- `db:studio`: Open Prisma Studio
 
-## Переменные окружения
+## Environment variables
 
-Для работы приложения могут потребоваться переменные окружения, которые обычно определяются в файле `.env.local`:
+The application may require environment variables defined in `.env.local`:
 
-- `DATABASE_URL` - URL для подключения к базе данных (по умолчанию использует SQLite файл)
-
-## Зависимости
-
-Проект использует следующие основные зависимости:
-
-### Runtime зависимости:
-
-- `next` - фреймворк для React-приложений
-- `react`, `react-dom` - библиотеки для создания пользовательских интерфейсов
-- `@prisma/client` - ORM для работы с базой данных
-- `zustand` - библиотека для управления состоянием
-- `zod` - библиотека для валидации схем
-- `@radix-ui/themes` - дизайн-система и компоненты
-- `tailwindcss` - CSS-фреймворк
-- `better-sqlite3` - драйвер для SQLite
-
-### Dev зависимости:
-
-- `@types/*` - TypeScript типы для различных библиотек
-- `eslint` - инструмент для проверки качества кода
-- `prisma` - инструмент для работы с базой данных
-- `typescript` - язык программирования с типизацией
+- `DATABASE_URL` — database connection URL (by default uses a local SQLite file)

@@ -1,59 +1,58 @@
-# Технологии проекта
+# Project technologies
 
-## Основной стек
+## Core stack
 
 ### Frontend
 
-- **Next.js 16.1.6** - Фреймворк для React-приложений с поддержкой SSR/SSG
-- **React 19.2.3** - Библиотека для создания пользовательских интерфейсов
-- **TypeScript** - Язык программирования с типизацией, надстройка над JavaScript
-- **Tailwind CSS** - Utility-first CSS фреймворк для стилизации компонентов
+- **Next.js 16.1.6** — React framework with SSR/SSG
+- **React 19.2.3** — UI library
+- **TypeScript** — Typed superset of JavaScript
+- **Tailwind CSS** — Utility-first CSS framework
 
-### State Management
+### State management
 
-- **Zustand** - Легковесный менеджер состояния для React
-- **React Hook Form** - Библиотека для управления формами и валидации
+- **Zustand** — Lightweight state manager for React
+- **React Hook Form** — Form management and validation
 
-### Backend & Database
+### Backend & database
 
-- **Prisma ORM** - Современный ORM для TypeScript и Node.js
-- **SQLite** - Встраиваемая SQL база данных
-- **Better-SQLite3** - Драйвер SQLite для Node.js
+- **Prisma ORM** — Modern ORM for TypeScript/Node.js
+- **SQLite** — Embedded SQL database
+- **better-sqlite3** — SQLite driver for Node.js
 
-### UI Components
+### UI components
 
-- **Radix UI Themes** - Дизайн-система и компоненты для React
-- **Geist Font** - Современные шрифты от Vercel
+- **Radix UI Themes** — Design system and components for React
+- **Geist Font** — Modern fonts from Vercel
 
-### Schema Validation
+### Schema validation
 
-- **Zod** - Библиотека для валидации схем и типизации TypeScript
+- **Zod** — Schema validation and TypeScript inference
 
-### Development Tools
+### Development tools
 
-- **ESLint** - Инструмент для проверки качества кода
-- **PostCSS** - Инструмент для трансформации CSS с помощью плагинов
+- **ESLint** — Linting and code quality
+- **PostCSS** — CSS transformation tooling
 
-## Архитектурные решения
+## Architectural notes
 
-### Состояние приложения
+### App state
 
-- Используется Zustand для глобального управления состоянием
-- Разделение на `authStore` для аутентификации и `travelStore` для данных путешествий
+- Zustand is used for global state management
+- Stores are split into `authStore` (authentication) and `travelStore` (trips data)
 
-### Работа с данными
+### Data handling
 
-- Prisma используется как ORM для взаимодействия с базой данных
-- Серверные функции для получения данных (server actions)
-- Клиентские компоненты для интерактивности
+- Prisma is the ORM used to access the database
+- Server functions provide data fetching, while client components handle interactivity
 
-### Стилизация
+### Styling
 
-- Tailwind CSS для utility-first подхода к стилизации
-- Radix UI для доступных и настраиваемых компонентов
-- Градиенты и стекло-подобные эффекты для современного дизайна
+- Tailwind CSS for utility-first styling
+- Radix UI for accessible, composable components
+- Gradients and glass-like visual effects are used for a modern UI
 
-### Безопасность
+### Security
 
-- Используется клиентское хранилище для сессий пользователя
-- Валидация данных через Zod перед сохранением
+- Session state is kept in client storage for this demo
+- Input validation is performed with Zod before saving data

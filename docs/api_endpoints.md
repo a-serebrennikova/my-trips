@@ -1,16 +1,16 @@
-# API Эндпоинты
+# API Endpoints
 
-## Описание
+## Overview
 
-Приложение использует Next.js API Routes для предоставления REST-подобных эндпоинтов. Все эндпоинты находятся в директории `app/api/travel`.
+This project exposes REST-like API endpoints using Next.js API Routes. All travel-related endpoints are located under `app/api/travel`.
 
-## Структура API
+## API Structure
 
 ### GET `/api/travel`
 
-Получение всех данных путешествий и пользователей.
+Retrieve all travel and user data.
 
-**Ответ:**
+**Response:**
 
 ```json
 {
@@ -21,9 +21,9 @@
 
 ### GET `/api/travel/me`
 
-Получение данных текущего пользователя (через симуляцию сессии).
+Retrieve the current user (session is simulated in this demo project).
 
-**Ответ:**
+**Response:**
 
 ```json
 {
@@ -33,9 +33,9 @@
 
 ### GET `/api/travel/trips`
 
-Получение всех путешествий.
+Retrieve all trips.
 
-**Ответ:**
+**Response:**
 
 ```json
 [
@@ -52,13 +52,13 @@
 
 ### GET `/api/travel/trips/[tripId]`
 
-Получение информации о конкретном путешествии по ID.
+Retrieve a single trip by ID.
 
-**Параметры:**
+**Parameters:**
 
-- `tripId` - идентификатор путешествия
+- `tripId` — trip identifier
 
-**Ответ:**
+**Response:**
 
 ```json
 {
@@ -70,14 +70,14 @@
 
 ### POST `/api/travel/trips/[tripId]/like`
 
-Добавление или удаление лайка у путешествия.
+Toggle a like for a trip (add or remove).
 
-**Параметры:**
+**Parameters:**
 
-- `tripId` - идентификатор путешествия
-- Тело запроса: `{ userId: string, action: "add" | "remove" }`
+- `tripId` — trip identifier
+- Request body: `{ userId: string, action: "add" | "remove" }`
 
-**Ответ:**
+**Response:**
 
 ```json
 {
@@ -88,14 +88,14 @@
 
 ### POST `/api/travel/trips/[tripId]/comments`
 
-Добавление комментария к путешествию.
+Add a comment to a trip.
 
-**Параметры:**
+**Parameters:**
 
-- `tripId` - идентификатор путешествия
-- Тело запроса: `{ authorId: string, message: string }`
+- `tripId` — trip identifier
+- Request body: `{ authorId: string, message: string }`
 
-**Ответ:**
+**Response:**
 
 ```json
 {
@@ -104,37 +104,33 @@
 }
 ```
 
-## Методы работы с API
+## Implementation details
 
-### Внутренние вызовы
+### Internal helpers
 
-API эндпоинты используют внутренние методы из `lib/serverTravelDb.ts` для работы с базой данных через Prisma ORM.
+API endpoints delegate data operations to internal helpers in `lib/serverTravelDb.ts`, which use Prisma Client to access the database.
 
-### Обработка ошибок
+### Error handling
 
-Все эндпоинты возвращают соответствующие HTTP статусы:
+Endpoints return standard HTTP status codes:
 
-- 200 OK - успешный запрос
-- 404 Not Found - запрашиваемый ресурс не найден
-- 500 Internal Server Error - внутренняя ошибка сервера
+- `200 OK` — successful request
+- `404 Not Found` — requested resource not found
+- `500 Internal Server Error` — server error
 
-## Использование в приложении
+## Usage in the app
 
-### Получение данных
+Client components call functions from `lib/travelApi.ts` to interact with these endpoints.
 
-Клиентские компоненты используют функции из `lib/travelApi.ts` для вызова API эндпоинтов.
+All API operations are asynchronous and use Promises.
 
-### Асинхронные операции
+## Security
 
-Все операции с API являются асинхронными и используют Promise-based подход.
+### Validation
 
-## Безопасность
+Incoming payloads are validated using Zod schemas before being persisted.
 
-### Валидация
+### Authorization
 
-Все входящие данные валидируются с помощью Zod схем перед сохранением в базу данных.
-
-### Права доступа
-
-- Чтение данных доступно всем пользователям
-- Изменение данных (лайки, комментарии) требует аутентификации пользователя
+- Read operations are public.
+- Mutations (likes, comments) require an authenticated user.

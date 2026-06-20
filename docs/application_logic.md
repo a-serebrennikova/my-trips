@@ -1,140 +1,135 @@
-# Логика приложения
+# Application Logic
 
-## Общее описание
+## Overview
 
-myTrips — это веб-приложение для ведения личного дневника путешествий. Пользователи могут создавать записи о своих поездках, делиться ими с друзьями, оставлять комментарии и ставить лайки.
+myTrips is a lightweight travel diary web app. Users can create trip entries, share them with friends, comment, and like trips.
 
-## Структура приложения
+## App structure
 
-### Главная страница (`/`)
+### Home (`/`)
 
-- Отображает приветственное сообщение и краткое описание приложения
-- Показывает последние путешествия друзей
-- Предоставляет кнопки для навигации к основным разделам
+- Shows a welcome message and short description
+- Displays recent trips from friends
+- Provides navigation to main sections
 
-### Авторизация (`/login`)
+### Authentication (`/login`)
 
-- Страница входа в систему
-- Позволяет выбрать пользователя из списка существующих
-- После выбора пользователя устанавливается текущий пользователь в состоянии
+- Login page that allows selecting an existing user
+- Selecting a user sets the current user in the app state
 
-### Профиль пользователя (`/me`)
+### Profile (`/me`)
 
-- Отображает информацию о текущем пользователе
-- Показывает количество совершенных поездок
-- Предоставляет доступ к созданию новых поездок
+- Displays current user information
+- Shows the number of trips created
+- Provides access to create new trips
 
-### Страница путешествий (`/trips`)
+### Trips list (`/trips`)
 
-- Отображает список всех путешествий
-- Путешествия можно просматривать, комментировать и ставить лайки
-- Есть возможность создать новое путешествие
+- Displays a list of all trips
+- Trips can be viewed, commented on, and liked
+- Users can create a new trip
 
-### Создание путешествия (`/trips/new`)
+### Create trip (`/trips/new`)
 
-- Форма для создания нового путешествия
-- Позволяет указать название, город, страну, даты, стоимость, рейтинг и другие параметры
-- Можно добавить заметки, места (достопримечательности и кафе)
+- Form to create a new trip
+- Fields: title, city, country, start/end dates, cost, rating, notes, places
 
-### Детали путешествия (`/trips/[tripId]`)
+### Trip details (`/trips/[tripId]`)
 
-- Подробная информация о конкретном путешествии
-- Отображаются даты, стоимость, рейтинг, заметки
-- Карта мест путешествия
-- Комментарии других пользователей
-- Возможность поставить лайк
+- Detailed information about a trip (dates, cost, rating, notes)
+- Map of places related to the trip
+- User comments and ability to like the trip
 
-### Избранное (`/favorites`)
+### Favorites (`/favorites`)
 
-- Список путешествий, которые понравились текущему пользователю
-- Путешествия сортируются по количеству лайков
+- List of trips liked by the current user
+- Sorted by number of likes
 
-### Друзья (`/friends`)
+### Friends (`/friends`)
 
-- Список всех пользователей системы
-- Показывает количество поездок каждого пользователя
-- Можно перейти к просмотру профиля друга
+- List of users in the system
+- Shows number of trips per user
+- Link to view a friend's profile
 
-### Профиль друга (`/friends/[userId]`)
+### Friend profile (`/friends/[userId]`)
 
-- Информация о конкретном пользователе
-- Список всех его путешествий
+- Information about a specific user
+- List of their trips
 
-## Условия отображения
+## Display rules
 
-### Аутентификация
+### Authentication
 
-- Если пользователь не вошел в систему:
-  - Отображается кнопка "Войти" в шапке
-  - Некоторые функции недоступны (например, создание путешествий)
-- Если пользователь вошел:
-  - Отображается его имя и аватар в шапке
-  - Все функции приложения доступны
+- If the user is not signed in:
+  - A "Sign in" button is shown in the header
+  - Some actions are disabled (e.g. creating trips)
+- If the user is signed in:
+  - Their name and avatar are displayed in the header
+  - All app features are available
 
-### Права доступа
+### Permissions
 
-- Пользователь может создавать свои путешествия
-- Пользователь может комментировать и ставить лайки любым путешествиям
-- Пользователь может просматривать профили других пользователей
-- Пользователь может видеть свои избранные путешествия (те, которым он поставил лайк)
+- Users can create their own trips
+- Users can comment and like any trip
+- Users can view other users' profiles
+- Users can see their favorites (trips they liked)
 
-### Отображение данных
+### Data display
 
-- На главной странице показываются последние 3 путешествия (любых пользователей)
-- На странице путешествий показываются все путешествия
-- На странице избранного показываются путешествия, которым текущий пользователь поставил лайк
-- На странице друзей показываются все пользователи системы
-- На странице профиля друга показываются только его путешествия
+- The home page shows the latest 3 trips
+- The trips page lists all trips
+- The favorites page shows trips liked by the current user
+- The friends page shows all users
+- A friend's profile displays only their trips
 
-## Интерактивные элементы
+## Interactive elements
 
-### Лайки
+### Likes
 
-- Пользователь может ставить и убирать лайки у путешествий
-- Количество лайков влияет на сортировку в разделе "Избранное"
-- Состояние лайка сохраняется в базе данных
+- Users can toggle likes on trips
+- Like counts affect sorting in Favorites
+- Like state is persisted in the database
 
-### Комментарии
+### Comments
 
-- Пользователь может оставлять комментарии к путешествиям
-- Комментарии отображаются под деталями путешествия
-- Каждый комментарий содержит информацию об авторе и времени создания
+- Users can add comments to trips
+- Comments appear under the trip details
+- Each comment includes author and timestamp
 
-### Навигация
+### Navigation
 
-- Шапка сайта содержит основные ссылки для навигации
-- Цвет активной ссылки отличается для лучшей визуализации текущего раздела
-- Все переходы между страницами реализованы через Next.js роутинг
+- The header contains primary navigation links
+- Active link styling indicates the current section
+- Routing is implemented using Next.js
 
-## Состояния приложения
+## App state
 
-### Глобальное состояние
+### Global state
 
-- Используется Zustand для управления глобальным состоянием
-- `authStore`: хранит информацию о текущем пользователе
-- `travelStore`: временно хранит данные о путешествиях (в будущем будет заменено на API вызовы)
+- Zustand is used for global state management
+- `authStore` stores current user info
+- `travelStore` temporarily stores trips data (will be replaced with API calls later)
 
-### Загрузка данных
+### Data loading
 
-- На каждой странице, где требуются данные, происходит их загрузка
-- Используются серверные функции для получения данных из базы
-- Для улучшения UX используются компоненты загрузки (loading.tsx)
+- Pages load required data from server-side functions
+- Loading indicators are used to improve UX (loading.tsx)
 
-## Особенности интерфейса
+## UI notes
 
-### Адаптивность
+### Responsiveness
 
-- Приложение адаптировано для разных размеров экранов
-- Используется гибкая сетка (Grid/Flexbox) для правильного отображения на мобильных устройствах
+- The app is responsive and adapts to different screen sizes
+- Layout uses Grid/Flexbox for mobile-friendly rendering
 
-### Дизайн
+### Design
 
-- Используется цветовая палитра с преобладанием синих тонов (ассоциации с небом и путешествиями)
-- Применены эффекты "стеклянной морфологии" для некоторых элементов
-- Четкая типографика с использованием шрифтов Geist
+- Color palette leans toward blue tones (evoking sky and travel)
+- Glass-like effects and gradients are applied to some UI elements
+- Clean typography using Geist fonts
 
 ### UX
 
-- Плавные переходы между состояниями
-- Визуальная обратная связь при взаимодействии с элементами
-- Индикаторы загрузки при получении данных
+- Smooth transitions between states
+- Visual feedback on interactions
+- Loading indicators during data fetches

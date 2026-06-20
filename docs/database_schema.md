@@ -1,144 +1,143 @@
-# Схема базы данных
+# Database schema
 
-## Описание
+## Overview
 
-Проект использует Prisma ORM для работы с базой данных SQLite. Схема определена в файле `prisma/schema.prisma`.
+This project uses Prisma ORM with a SQLite database. The schema is defined in `prisma/schema.prisma`.
 
-## Модели данных
+## Data models
 
 ### User
 
-Модель пользователя системы.
+User model.
 
-**Поля:**
+**Fields:**
 
-- `id` (String) - уникальный идентификатор пользователя (генерируется автоматически с помощью cuid())
-- `name` (String) - имя пользователя
-- `avatarColor` (String) - цвет аватара пользователя (используется для визуального отображения)
-- `homeCity` (String) - родной город пользователя
+- `id` (String) — unique identifier (generated via `cuid()`)
+- `name` (String) — user name
+- `avatarColor` (String) — avatar color used for visuals
+- `homeCity` (String) — user's home city
 
-**Связи:**
+**Relations:**
 
-- `trips` - связи один ко многим с моделью Trip (каскадное удаление)
-- `comments` - связи один ко многим с моделью Comment (каскадное удаление)
-- `likes` - связи один ко многим с моделью TripLike (каскадное удаление)
+- `trips` — one-to-many relation to `Trip` (cascade on delete)
+- `comments` — one-to-many relation to `Comment` (cascade on delete)
+- `likes` — one-to-many relation to `TripLike` (cascade on delete)
 
 ### Trip
 
-Модель путешествия.
+Trip model.
 
-**Поля:**
+**Fields:**
 
-- `id` (String) - уникальный идентификатор путешествия (генерируется автоматически с помощью cuid())
-- `userId` (String) - внешний ключ на пользователя, создавшего путешествие
-- `title` (String) - заголовок путешествия
-- `city` (String) - город путешествия
-- `country` (String) - страна путешествия
-- `startDate` (String) - дата начала путешествия
-- `endDate` (String) - дата окончания путешествия
-- `days` (Int) - продолжительность путешествия в днях
-- `approximateCost` (Int) - примерная стоимость путешествия
-- `currency` (String) - валюта стоимости путешествия ("₽", "€", "$")
-- `rating` (Int) - рейтинг путешествия (от 1 до 5)
-- `coverImage` (String) - URL обложки путешествия
-- `notes` (String?) - дополнительные заметки (необязательное поле)
-- `createdAt` (String) - дата создания путешествия
+- `id` (String) — unique trip id (generated via `cuid()`)
+- `userId` (String) — foreign key to the user who created the trip
+- `title` (String) — trip title
+- `city` (String) — trip city
+- `country` (String) — trip country
+- `startDate` (String) — trip start date
+- `endDate` (String) — trip end date
+- `days` (Int) — length of the trip in days
+- `approximateCost` (Int) — estimated cost
+- `currency` (String) — currency symbol ("₽", "€", "$")
+- `rating` (Int) — rating (1–5)
+- `coverImage` (String) — cover image URL
+- `notes` (String?) — optional notes
+- `createdAt` (String) — creation timestamp
 
-**Связи:**
+**Relations:**
 
-- `user` - связь многие к одному с моделью User (каскадное удаление)
-- `places` - связи один ко многим с моделью Place (каскадное удаление)
-- `comments` - связи один ко многим с моделью Comment (каскадное удаление)
-- `likes` - связи один ко многим с моделью TripLike (каскадное удаление)
+- `user` — many-to-one to `User` (cascade on delete)
+- `places` — one-to-many to `Place` (cascade on delete)
+- `comments` — one-to-many to `Comment` (cascade on delete)
+- `likes` — one-to-many to `TripLike` (cascade on delete)
 
 ### Place
 
-Модель места в путешествии (достопримечательность или кафе).
+Place model for trip locations (attractions or cafes).
 
-**Поля:**
+**Fields:**
 
-- `id` (String) - уникальный идентификатор места (генерируется автоматически с помощью cuid())
-- `name` (String) - название места
-- `city` (String) - город, где находится место
-- `note` (String?) - заметка о месте (необязательное поле)
-- `tripId` (String) - внешний ключ на путешествие
-- `type` (String) - тип места ("attraction" для достопримечательности или "cafe" для кафе)
+- `id` (String) — unique place id (generated via `cuid()`)
+- `name` (String) — place name
+- `city` (String) — city of the place
+- `note` (String?) — optional note
+- `tripId` (String) — foreign key to the trip
+- `type` (String) — place type (`"attraction"` or `"cafe"`)
 
-**Связи:**
+**Relations:**
 
-- `trip` - связь многие к одному с моделью Trip (каскадное удаление)
+- `trip` — many-to-one to `Trip` (cascade on delete)
 
 ### Comment
 
-Модель комментария к путешествию.
+Comment model for trip comments.
 
-**Поля:**
+**Fields:**
 
-- `id` (String) - уникальный идентификатор комментария (генерируется автоматически с помощью cuid())
-- `tripId` (String) - внешний ключ на путешествие
-- `authorId` (String) - внешний ключ на пользователя, оставившего комментарий
-- `message` (String) - текст комментария
-- `createdAt` (String) - дата создания комментария
+- `id` (String) — unique comment id (generated via `cuid()`)
+- `tripId` (String) — foreign key to the trip
+- `authorId` (String) — foreign key to the user who wrote the comment
+- `message` (String) — comment text
+- `createdAt` (String) — creation timestamp
 
-**Связи:**
+**Relations:**
 
-- `trip` - связь многие к одному с моделью Trip (каскадное удаление)
-- `author` - связь многие к одному с моделью User (каскадное удаление)
+- `trip` — many-to-one to `Trip` (cascade on delete)
+- `author` — many-to-one to `User` (cascade on delete)
 
 ### TripLike
 
-Модель лайка путешествия (связь многие ко многим между Trip и User).
+Join model representing likes (many-to-many between `Trip` and `User`).
 
-**Поля:**
+**Fields:**
 
-- `tripId` (String) - внешний ключ на путешествие
-- `userId` (String) - внешний ключ на пользователя
+- `tripId` (String) — foreign key to the trip
+- `userId` (String) — foreign key to the user
 
-**Связи:**
+**Relations:**
 
-- `trip` - связь многие к одному с моделью Trip (каскадное удаление)
-- `user` - связь многие к одному с моделью User (каскадное удаление)
+- `trip` — many-to-one to `Trip` (cascade on delete)
+- `user` — many-to-one to `User` (cascade on delete)
 
-**Идентификатор:**
+**Primary key:**
 
-- Составной первичный ключ из `tripId` и `userId`
+- Composite primary key on `tripId` and `userId` to prevent duplicate likes
 
-## Связи между моделями
+## Relations between models
 
 ### User ↔ Trip
 
-- Один пользователь может создать много путешествий
-- При удалении пользователя удаляются все его путешествия (каскадное удаление)
+- One user can create many trips
+- Deleting a user cascades and removes their trips
 
 ### Trip ↔ Place
 
-- Одно путешествие может содержать много мест
-- При удалении путешествия удаляются все связанные места (каскадное удаление)
+- One trip can have many places
+- Deleting a trip cascades and removes related places
 
 ### User ↔ Comment
 
-- Один пользователь может оставить много комментариев
-- При удалении пользователя удаляются все его комментарии (каскадное удаление)
+- One user can create many comments
+- Deleting a user cascades and removes their comments
 
 ### Trip ↔ Comment
 
-- Одно путешествие может иметь много комментариев
-- При удалении путешествия удаляются все комментарии к нему (каскадное удаление)
+- One trip can have many comments
+- Deleting a trip cascades and removes its comments
 
 ### User ↔ Trip ↔ TripLike
 
-- Многие пользователи могут лайкать много путешествий
-- Многие путешествия могут быть лайкнуты многими пользователями
-- Реализовано через промежуточную модель TripLike
+- Many users can like many trips
+- Implemented via the intermediate `TripLike` model
 
-## Индексы и ограничения
+## Indexes and constraints
 
-- Все модели имеют уникальный идентификатор с авто-генерацией cuid()
-- Модель TripLike имеет составной первичный ключ для предотвращения дубликатов лайков
-- Все связи с каскадным удалением обеспечивают целостность данных
+- All models use `cuid()` for unique identifiers
+- `TripLike` uses a composite primary key to prevent duplicate likes
+- Cascade deletes are used to maintain referential integrity
 
-## Использование в приложении
+## Usage in the app
 
-- Модели используются через Prisma Client для выполнения CRUD операций
-- Связи позволяют эффективно получать связанные данные (например, путешествия пользователя или комментарии к путешествию)
-- Схема позволяет реализовать все функциональные возможности приложения: создание путешествий, комментирование, лайки и т.д.
+- Models are accessed via Prisma Client for CRUD operations
+- Relations make it easy to query related data (e.g. user's trips or trip comments)
+- The schema supports the app features: creating trips, commenting, and liking
