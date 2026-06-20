@@ -14,39 +14,14 @@ const tripSchema = z
     country: z.string().min(2, "Укажите страну"),
     startDate: z.string().min(1, "Дата начала обязательна"),
     endDate: z.string().min(1, "Дата окончания обязательна"),
-    days: z
-      .string()
-      .min(1, "Укажите количество дней")
-      .transform((value) => Number(value))
-      .pipe(z.number().int().positive("Количество дней должно быть > 0")),
-    approximateCost: z
-      .string()
-      .min(1, "Укажите примерную стоимость")
-      .transform((value) => Number(value.replace(/\s/g, "")))
-      .pipe(z.number().positive("Стоимость должна быть положительным числом")),
+    days: z.string().min(1, "Укажите количество дней"),
+    approximateCost: z.string().min(1, "Укажите примерную стоимость"),
     currency: z.enum(["₽", "€", "$"]),
-    rating: z
-      .string()
-      .min(1, "Укажите оценку")
-      .transform((value) => Number(value))
-      .pipe(
-        z
-          .number()
-          .min(1, "Минимальная оценка — 1")
-          .max(5, "Максимальная оценка — 5"),
-      ),
-    notes: z
-      .string()
-      .max(1000, "Максимум 1000 символов")
-      .optional()
-      .transform((value) => value?.trim() || undefined),
-    attractionsRaw: z.string().max(1000, "Максимум 1000 символов").optional(),
-    cafesRaw: z.string().max(1000, "Максимум 1000 символов").optional(),
-    coverImage: z
-      .string()
-      .url("Введите корректный URL для обложки")
-      .optional()
-      .or(z.literal("")),
+    rating: z.string().min(1, "Укажите оценку"),
+    notes: z.string().max(1000, "Максимум 1000 символов"),
+    attractionsRaw: z.string().max(1000, "Максимум 1000 символов"),
+    cafesRaw: z.string().max(1000, "Максимум 1000 символов"),
+    coverImage: z.string().or(z.literal("")),
   })
   .refine(
     (data) =>
@@ -70,9 +45,20 @@ export default function NewTripPage() {
   } = useForm<TripFormValues>({
     resolver: zodResolver(tripSchema),
     defaultValues: {
+      title: "",
+      city: "",
+      country: "",
+      startDate: "",
+      endDate: "",
+      days: "",
+      approximateCost: "",
       currency: "₽",
-      rating: "5" as unknown as TripFormValues["rating"],
-    } as Partial<TripFormValues>,
+      rating: "5",
+      notes: "",
+      attractionsRaw: "",
+      cafesRaw: "",
+      coverImage: "",
+    },
   });
 
   if (!currentUser) {
@@ -101,6 +87,22 @@ export default function NewTripPage() {
     const attractions = parsePlaces(values.attractionsRaw);
     const cafes = parsePlaces(values.cafesRaw);
 
+    // Convert string values to numbers
+    const days = Number(values.days);
+    const rating = Number(values.rating);
+    const approximateCost = Number(values.approximateCost.replace(/\s/g, ""));
+
+    // Validate converted values
+    if (!Number.isInteger(days) || days <= 0) {
+      throw new Error("Количество дней должно быть положительным числом");
+    }
+    if (rating < 1 || rating > 5) {
+      throw new Error("Оценка должна быть от 1 до 5");
+    }
+    if (approximateCost <= 0) {
+      throw new Error("Стоимость должна быть положительным числом");
+    }
+
     await createTrip({
       userId: currentUser.id,
       title: values.title,
@@ -108,15 +110,15 @@ export default function NewTripPage() {
       country: values.country,
       startDate: values.startDate,
       endDate: values.endDate,
-      days: values.days as number,
-      approximateCost: values.approximateCost as number,
+      days,
+      approximateCost,
       currency: values.currency,
-      rating: values.rating as number,
+      rating,
       coverImage:
         values.coverImage && values.coverImage.length > 0
           ? values.coverImage
           : "https://era74.ru/media/catalog/2019/08/06/no-photo_94BoRIW.png",
-      notes: values.notes,
+      notes: values.notes.trim() || undefined,
       attractions,
       cafes,
       comments: [],
