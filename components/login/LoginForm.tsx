@@ -5,23 +5,19 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useRouter } from "next/navigation";
-import { useAuthStore } from "@/lib/authStore";
-import type { User } from "@/lib/travelStore";
+import { useAuthStore } from "@/store/authStore";
+import { loginUser } from "@/store/travelApi";
 
 const loginSchema = z.object({
-  email: z.string().email("Введите корректный email"),
-  password: z.string().min(1, "Введите пароль"),
+  email: z.string().email("Enter a valid email"),
+  password: z.string().min(1, "Enter password"),
 });
 
 type LoginFormData = z.infer<typeof loginSchema>;
 
-interface Props {
-  users: User[];
-}
-
-export function LoginForm({ users }: Props) {
+export function LoginForm() {
   const router = useRouter();
-  const setCurrentUser = useAuthStore((state) => state.setCurrentUser);
+  const setAuthSession = useAuthStore((state) => state.setAuthSession);
   const [loginError, setLoginError] = useState<string | null>(null);
 
   const {
@@ -32,18 +28,15 @@ export function LoginForm({ users }: Props) {
     resolver: zodResolver(loginSchema),
   });
 
-  const onSubmit = (data: LoginFormData) => {
+  const onSubmit = async (data: LoginFormData) => {
     setLoginError(null);
 
-    const user = users.find(
-      (u) => u.email === data.email && u.password === data.password,
-    );
-
-    if (user) {
-      setCurrentUser(user);
+    try {
+      const { user, token } = await loginUser(data.email, data.password);
+      setAuthSession(user, token);
       router.push("/trips");
-    } else {
-      setLoginError("Неверный email или пароль");
+    } catch {
+      setLoginError("Invalid email or password");
     }
   };
 
@@ -74,14 +67,14 @@ export function LoginForm({ users }: Props) {
             htmlFor="password"
             className="block text-sm font-medium text-slate-700"
           >
-            Пароль
+            Password
           </label>
           <input
             id="password"
             type="password"
             {...register("password")}
             className="w-full rounded-2xl border border-sky-100 bg-sky-50/60 px-4 py-2.5 text-sm text-slate-800 outline-none ring-sky-400 focus:bg-white focus:ring-2"
-            placeholder="Введите пароль"
+            placeholder="Enter password"
           />
           {errors.password && (
             <p className="text-sm text-red-500">{errors.password.message}</p>
@@ -96,7 +89,7 @@ export function LoginForm({ users }: Props) {
         disabled={isSubmitting}
         className="w-full rounded-lg bg-sky-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-sky-700 disabled:cursor-not-allowed disabled:opacity-50"
       >
-        {isSubmitting ? "Вход..." : "Войти"}
+        {isSubmitting ? "Signing in..." : "Sign in"}
       </button>
     </form>
   );

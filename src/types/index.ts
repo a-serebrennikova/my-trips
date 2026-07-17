@@ -1,9 +1,7 @@
-// TODO get from api
 export type User = {
   id: string;
   name: string;
   email: string;
-  password: string;
   avatarColor: string;
   homeCity: string;
 };
@@ -33,7 +31,7 @@ export type Trip = {
   endDate: string;
   days: number;
   approximateCost: number;
-  currency: "₽" | "€" | "$";
+  currency: "RUB" | "EUR" | "USD" | "₽" | "€" | "$";
   rating: number;
   coverImage: string;
   notes?: string;

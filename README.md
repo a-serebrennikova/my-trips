@@ -1,6 +1,6 @@
 # myTrips — your travel diary
 
-This project was built as a learning exercise using Next.js, Tailwind CSS, Prisma, and Cursor & Cloude.
+This project was built as a learning exercise using Next.js, Tailwind CSS, PostgreSQL (Neon).
 
 ## Project Overview
 
@@ -15,10 +15,10 @@ myTrips is a web app for keeping a personal travel diary. Users can create trip 
 - Filter and sort trips by various criteria
 - Personal user profile
 
-## Table of contents
+## Demo Accounts
 
-- [Project Overview](#project-overview)
-- [Stack](./docs/stack.md)
-- [Project Structure](./docs/project_structure.md)
-- [Documentation](./docs/documentation.md)
-- [Installation & Run](./docs/installation.md)
+Use these accounts for local development and testing after running seed:
+
+- anastasia@example.com / password123
+- ivan@example.com / password123
+- maria@example.com / password123

@@ -1,63 +1,73 @@
+export const runtime = "nodejs";
+
 import { NextResponse } from "next/server";
-import { revalidateTag } from "next/cache";
-import {
-  getTripById,
-  updateTrip,
-  deleteTrip,
-} from "@/lib/serverTravelDb";
-import type { Trip } from "@/lib/travelStore";
+import { getTripById, updateTrip, deleteTrip } from "@/src/db/trips";
+import { getBearerToken, verifyAuthToken } from "@/src/lib/auth";
+import type { Trip } from "@/src/types";
 
 export async function GET(
   _request: Request,
   { params }: { params: Promise<{ tripId: string }> },
 ) {
-  const { tripId } = await params;
-  const trip = await getTripById(tripId);
-
-  if (!trip) {
-    return NextResponse.json(
-      { error: "Путешествие не найдено" },
-      { status: 404 },
-    );
+  try {
+    const { tripId } = await params;
+    const trip = await getTripById(tripId);
+    if (!trip) {
+      return NextResponse.json({ error: "Trip not found" }, { status: 404 });
+    }
+    return NextResponse.json(trip);
+  } catch {
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
-
-  return NextResponse.json(trip);
 }
 
 export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ tripId: string }> },
 ) {
-  const { tripId } = await params;
-  const body = (await request.json()) as Partial<Trip>;
+  try {
+    const token = getBearerToken(request.headers.get("authorization") ?? undefined);
+    if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const updated = await updateTrip(tripId, body);
+    const payload = verifyAuthToken(token);
+    if (!payload) return NextResponse.json({ error: "Invalid token" }, { status: 401 });
 
-  if (!updated) {
-    return NextResponse.json(
-      { error: "Путешествие не найдено" },
-      { status: 404 },
-    );
+    const { tripId } = await params;
+    const existing = await getTripById(tripId);
+    if (!existing) return NextResponse.json({ error: "Trip not found" }, { status: 404 });
+    if (existing.userId !== payload.userId) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    const patch = await request.json() as Partial<Trip>;
+    const updated = await updateTrip(tripId, patch);
+    return NextResponse.json(updated);
+  } catch {
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
-
-  revalidateTag("travelData", "max");
-  return NextResponse.json(updated);
 }
 
 export async function DELETE(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ tripId: string }> },
 ) {
-  const { tripId } = await params;
-  const deleted = await deleteTrip(tripId);
+  try {
+    const token = getBearerToken(request.headers.get("authorization") ?? undefined);
+    if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  if (!deleted) {
-    return NextResponse.json(
-      { error: "Путешествие не найдено" },
-      { status: 404 },
-    );
+    const payload = verifyAuthToken(token);
+    if (!payload) return NextResponse.json({ error: "Invalid token" }, { status: 401 });
+
+    const { tripId } = await params;
+    const existing = await getTripById(tripId);
+    if (!existing) return NextResponse.json({ error: "Trip not found" }, { status: 404 });
+    if (existing.userId !== payload.userId) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    await deleteTrip(tripId);
+    return new NextResponse(null, { status: 204 });
+  } catch {
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
-
-  revalidateTag("travelData", "max");
-  return NextResponse.json({ success: true });
 }

@@ -8,12 +8,19 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: "Segoe UI", "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+  --font-mono:
+    "SFMono-Regular", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New",
+    monospace;
 }
 
 body {
-  background: radial-gradient(circle at top, #38bdf8 0, #0ea5e9 26%, #e0f2fe 70%);
+  background: radial-gradient(
+    circle at top,
+    #38bdf8 0,
+    #0ea5e9 26%,
+    #e0f2fe 70%
+  );
   color: var(--foreground);
 }
 

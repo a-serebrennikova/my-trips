@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useAuthStore } from "../lib/authStore";
+import { useAuthStore } from "../store/authStore";
 
 const navLinkBase =
   "px-3 py-2 rounded-full text-sm font-medium transition-colors";
@@ -32,7 +32,7 @@ export function Header() {
 
   return (
     <header className="bg-sky-700 text-sky-50">
-      <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
+      <div className="flex w-full items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8">
         <button
           type="button"
           onClick={() => router.push("/")}
@@ -46,16 +46,21 @@ export function Header() {
               myTrips
             </span>
             <span className="text-[11px] leading-tight text-sky-100/80">
-              Твои истории путешествий
+              Your travel stories
             </span>
           </div>
         </button>
 
-        <nav className="hidden items-center gap-2 sm:flex">
-          <NavLink href="/trips" label="Путешествия" />
-          <NavLink href="/favorites" label="Избранное" />
-          <NavLink href="/friends" label="Друзья" />
-        </nav>
+        {currentUser ? (
+          <nav className="hidden items-center gap-2 sm:flex">
+            <NavLink href="/" label="Home" />
+            <NavLink href="/trips" label="Trips" />
+            <NavLink href="/favorites" label="Favorites" />
+            <NavLink href="/friends" label="Friends" />
+          </nav>
+        ) : (
+          <div className="hidden sm:block" />
+        )}
 
         <div className="flex items-center gap-3">
           {currentUser ? (
@@ -78,7 +83,7 @@ export function Header() {
               onClick={() => router.push("/login")}
               className="rounded-full bg-white px-4 py-2 text-xs font-semibold text-sky-700 shadow-sm transition hover:bg-sky-50"
             >
-              Войти
+              Sign in
             </button>
           )}
         </div>

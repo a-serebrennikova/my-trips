@@ -1,43 +1,26 @@
+export const runtime = "nodejs";
+
 import { NextResponse } from "next/server";
-import { revalidateTag } from "next/cache";
-import { getTripById, toggleTripLike } from "@/lib/serverTravelDb";
+import { toggleTripLike } from "@/src/db/trips";
+import { getBearerToken, verifyAuthToken } from "@/src/lib/auth";
 
 export async function POST(
   request: Request,
   { params }: { params: Promise<{ tripId: string }> },
 ) {
-  const { tripId } = await params;
-  const body = (await request.json()) as { userId?: string };
+  try {
+    const token = getBearerToken(request.headers.get("authorization") ?? undefined);
+    if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  if (!body.userId) {
-    return NextResponse.json(
-      { error: "userId обязателен" },
-      { status: 400 },
-    );
+    const payload = verifyAuthToken(token);
+    if (!payload) return NextResponse.json({ error: "Invalid token" }, { status: 401 });
+
+    const { tripId } = await params;
+    const trip = await toggleTripLike(tripId, payload.userId);
+    if (!trip) return NextResponse.json({ error: "Trip not found" }, { status: 404 });
+
+    return NextResponse.json(trip);
+  } catch {
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
-
-  const trip = await getTripById(tripId);
-  if (!trip) {
-    return NextResponse.json(
-      { error: "Путешествие не найдено" },
-      { status: 404 },
-    );
-  }
-
-  if (trip.userId === body.userId) {
-    return NextResponse.json(
-      { error: "Нельзя лайкать свои путешествия" },
-      { status: 400 },
-    );
-  }
-
-  const updated = await toggleTripLike(tripId, body.userId);
-
-  if (!updated) {
-    return NextResponse.json({ error: "Путешествие не найдено" }, { status: 404 });
-  }
-
-  revalidateTag("travelData", "max");
-  return NextResponse.json(updated, { status: 200 });
 }
-
