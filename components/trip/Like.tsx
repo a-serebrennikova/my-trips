@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { useAuthStore } from "@/lib/authStore";
-import { toggleTripLike } from "@/lib/travelApi";
-import { Trip } from "@/lib/travelStore";
+import { useAuthStore } from "@/store/authStore";
+import { toggleTripLike } from "@/store/travelApi";
+import type { Trip } from "@/store/travelStore";
 import { useRouter } from "next/navigation";
 
 interface Props {
@@ -13,6 +13,7 @@ interface Props {
 export function Like({ trip }: Props) {
   const router = useRouter();
   const currentUser = useAuthStore((state) => state.currentUser);
+  const authToken = useAuthStore((state) => state.authToken);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const isOwnTrip = trip.userId === currentUser?.id;
@@ -30,7 +31,11 @@ export function Like({ trip }: Props) {
 
     setIsSubmitting(true);
     try {
-      await toggleTripLike(trip.id, currentUser.id);
+      if (!authToken) {
+        router.push("/login");
+        return;
+      }
+      await toggleTripLike(trip.id, authToken);
       router.refresh();
     } finally {
       setIsSubmitting(false);
@@ -41,9 +46,9 @@ export function Like({ trip }: Props) {
 
   if (isOwnTrip) {
     return (
-      <div className="inline-flex items-center gap-2 rounded-full bg-sky-50 px-4 py-1.5 text-xs font-semibold text-slate-500">
+      <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-1.5 text-xs font-semibold text-slate-500">
         <span>♡</span>
-        <span>{trip.likedByUserIds.length} лайков</span>
+        <span>{trip.likedByUserIds.length} likes</span>
       </div>
     );
   }
@@ -53,14 +58,14 @@ export function Like({ trip }: Props) {
       type="button"
       onClick={handleLikeClick}
       disabled={!canLike || isSubmitting}
-      className={`inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
+      className={`inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-xs font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
         isLiked
-          ? "bg-rose-500/10 text-rose-500"
-          : "bg-sky-50 text-slate-600 hover:bg-sky-100"
+          ? "border-rose-200 bg-rose-50 text-rose-500"
+          : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
       }`}
     >
       <span>{isLiked ? "♥" : "♡"}</span>
-      <span>{trip.likedByUserIds.length} лайков</span>
+      <span>{trip.likedByUserIds.length} likes</span>
     </button>
   );
 }

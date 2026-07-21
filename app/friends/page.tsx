@@ -1,10 +1,10 @@
-import { ProtectedPage } from "@/components/auth/ProtectedPage";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { FriendsPageClient } from "./FriendsPageClient";
 
 export default function FriendsPage() {
   return (
-    <ProtectedPage>
+    <ProtectedRoute>
       <FriendsPageClient />
-    </ProtectedPage>
+    </ProtectedRoute>
   );
 }

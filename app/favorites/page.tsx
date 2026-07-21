@@ -1,10 +1,10 @@
-import { ProtectedPage } from "@/components/auth/ProtectedPage";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { FavoritesPageClient } from "./FavoritesPageClient";
 
 export default function FavoritesPage() {
   return (
-    <ProtectedPage>
+    <ProtectedRoute>
       <FavoritesPageClient />
-    </ProtectedPage>
+    </ProtectedRoute>
   );
 }
