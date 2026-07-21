@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import type { Trip, User } from "../../store/travelStore";
+import type { Trip, User } from "@/types";
 import { Like } from "./Like";
 
 type TripCardProps = {

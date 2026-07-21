@@ -36,7 +36,7 @@ export function HomeStatsSection({
   friendsTraveling,
 }: HomeStatsSectionProps) {
   return (
-    <section className="glass-card grid gap-3 bg-white/95 p-4 sm:grid-cols-2 xl:grid-cols-4">
+    <section className="glass-card grid gap-3 p-4 sm:grid-cols-2 xl:grid-cols-4">
       <StatBadge
         icon="◎"
         value={String(countriesVisited)}

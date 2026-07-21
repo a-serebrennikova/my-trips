@@ -1,6 +1,6 @@
 import { TripCard } from "@/components/trip/TripCard";
 import { PageLayout } from "@/components/layout/PageLayout";
-import { getAllTravelData } from "@/src/db/trips";
+import { getAllTravelData } from "@/db/trips";
 import Link from "next/link";
 
 export const dynamic = "force-dynamic";

@@ -2,7 +2,7 @@
 
 import { useAuthStore } from "@/store/authStore";
 import { addCommentToTrip } from "@/store/travelApi";
-import type { Trip } from "@/store/travelStore";
+import type { Trip } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";

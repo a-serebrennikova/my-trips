@@ -1,12 +1,15 @@
 export const runtime = "nodejs";
 
 import { NextResponse } from "next/server";
-import { loginUser } from "@/src/db/users";
-import { signAuthToken } from "@/src/lib/auth";
+import { loginUser } from "@/db/users";
+import { signAuthToken } from "@/lib/auth";
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json() as { email?: string; password?: string };
+    const body = (await request.json()) as {
+      email?: string;
+      password?: string;
+    };
     const { email, password } = body;
 
     if (!email || !password) {
@@ -27,6 +30,9 @@ export async function POST(request: Request) {
     const token = signAuthToken({ userId: user.id, email: user.email });
     return NextResponse.json({ user, token });
   } catch {
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }

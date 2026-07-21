@@ -1,13 +1,15 @@
 export const runtime = "nodejs";
 
 import { NextResponse } from "next/server";
-import { getUserById } from "@/src/db/users";
-import { getUserTravelData } from "@/src/db/trips";
-import { getBearerToken, verifyAuthToken } from "@/src/lib/auth";
+import { getUserById } from "@/db/users";
+import { getUserTravelData } from "@/db/trips";
+import { getBearerToken, verifyAuthToken } from "@/lib/auth";
 
 export async function GET(request: Request) {
   try {
-    const token = getBearerToken(request.headers.get("authorization") ?? undefined);
+    const token = getBearerToken(
+      request.headers.get("authorization") ?? undefined,
+    );
     if (!token) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -26,8 +28,15 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    return NextResponse.json({ users: [user], trips, totalTrips: trips.length });
+    return NextResponse.json({
+      users: [user],
+      trips,
+      totalTrips: trips.length,
+    });
   } catch {
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }

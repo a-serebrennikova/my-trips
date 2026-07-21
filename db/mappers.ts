@@ -1,4 +1,4 @@
-import type { Comment, Place, Trip, User } from "@/src/types";
+import type { Comment, Place, Trip, User } from "@/types";
 import type { DbComment, DbPlace, DbTrip, DbTripLike, DbUser } from "./types";
 
 export function groupByTripId<T extends { trip_id: string }>(

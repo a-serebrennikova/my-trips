@@ -1,5 +1,5 @@
 import { compare as comparePassword, hash as hashPassword } from "bcryptjs";
-import type { User } from "@/src/types";
+import type { User } from "@/types";
 import { query } from "./client";
 import { mapDbUserToUser } from "./mappers";
 import {

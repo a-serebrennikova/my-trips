@@ -1,7 +1,6 @@
 import Link from "next/link";
-import { HomeStatsSection } from "@/components/main/HomeStatsSection";
 import { RedirectLink } from "@/components/main/RedirectLink";
-import { getAllTravelData } from "@/src/db/trips";
+import { getAllTravelData } from "@/db/trips";
 
 export const dynamic = "force-dynamic";
 
@@ -86,21 +85,21 @@ export default async function Home() {
 
   const latestCards = cards.slice(0, 2);
 
-  const countriesVisited = new Set(trips.map((trip) => trip.country)).size;
-  const completedTrips = trips.length;
-  const averageRating =
-    trips.length > 0
-      ? (
-          trips.reduce((acc, trip) => acc + trip.rating, 0) /
-          Math.max(1, trips.length)
-        ).toFixed(1)
-      : "-";
-  const friendsTraveling = users.length;
+  // const countriesVisited = new Set(trips.map((trip) => trip.country)).size;
+  // const completedTrips = trips.length;
+  // const averageRating =
+  //   trips.length > 0
+  //     ? (
+  //         trips.reduce((acc, trip) => acc + trip.rating, 0) /
+  //         Math.max(1, trips.length)
+  //       ).toFixed(1)
+  //     : "-";
+  // const friendsTraveling = users.length;
 
   return (
     <div className="relative left-1/2 w-screen max-w-none -translate-x-1/2 space-y-4 px-4 sm:px-6 lg:px-8">
       <div className="grid w-full items-stretch gap-4 lg:grid-cols-[1.02fr_0.98fr]">
-        <section className="glass-card w-full bg-gradient-to-br from-white via-white to-sky-50/60 p-6 sm:p-7">
+        <section className="glass-card w-full p-6 sm:p-7">
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-sky-700">
             PERSONAL TRAVEL DIARY
           </p>
@@ -161,7 +160,7 @@ export default async function Home() {
           </div>
         </section>
 
-        <section className="glass-card w-full min-w-0 bg-white/95 p-5 sm:p-6">
+        <section className="glass-card w-full min-w-0 p-5 sm:p-6">
           <div className="mb-4 flex items-start justify-between gap-3">
             <div>
               <h2 className="text-2xl font-semibold leading-[1.15] tracking-tight text-slate-900">
@@ -270,13 +269,14 @@ export default async function Home() {
           </div>
         </section>
       </div>
-
+      {/* TODO need to work */}
+      {/* 
       <HomeStatsSection
         countriesVisited={countriesVisited}
         completedTrips={completedTrips}
         averageRating={averageRating}
         friendsTraveling={friendsTraveling}
-      />
+      /> */}
     </div>
   );
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useAuthStore } from "@/store/authStore";
-import type { Trip, User } from "@/store/travelStore";
+import type { Trip, User } from "@/types";
 import Link from "next/link";
 
 interface Props {

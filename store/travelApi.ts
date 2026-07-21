@@ -1,7 +1,4 @@
-// Client-side API calls (used in client components and SWR hooks).
-// Server components should import from @/src/db/trips directly.
-
-import type { User, Trip, Comment } from "@/src/types";
+import type { User, Trip, Comment } from "@/types";
 
 export type TravelSnapshot = {
   users: User[];

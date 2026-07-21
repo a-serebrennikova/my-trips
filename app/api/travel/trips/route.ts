@@ -1,9 +1,9 @@
 export const runtime = "nodejs";
 
 import { NextResponse } from "next/server";
-import { getAllTravelData, createTrip } from "@/src/db/trips";
-import { getBearerToken, verifyAuthToken } from "@/src/lib/auth";
-import type { Trip } from "@/src/types";
+import { getAllTravelData, createTrip } from "@/db/trips";
+import { getBearerToken, verifyAuthToken } from "@/lib/auth";
+import type { Trip } from "@/types";
 
 export async function GET(request: Request) {
   try {
@@ -14,13 +14,18 @@ export async function GET(request: Request) {
     const data = await getAllTravelData(limit, offset);
     return NextResponse.json(data);
   } catch {
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }
 
 export async function POST(request: Request) {
   try {
-    const token = getBearerToken(request.headers.get("authorization") ?? undefined);
+    const token = getBearerToken(
+      request.headers.get("authorization") ?? undefined,
+    );
     if (!token) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -30,10 +35,16 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Invalid token" }, { status: 401 });
     }
 
-    const body = await request.json() as Omit<Trip, "id" | "userId" | "createdAt" | "likedByUserIds">;
+    const body = (await request.json()) as Omit<
+      Trip,
+      "id" | "userId" | "createdAt" | "likedByUserIds"
+    >;
     const trip = await createTrip(payload.userId, body);
     return NextResponse.json(trip, { status: 201 });
   } catch {
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }

@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import type { PoolClient } from "pg";
-import type { Comment, Place, Trip, User } from "@/src/types";
+import type { Comment, Place, Trip, User } from "@/types";
 import { query, withTransaction } from "./client";
 import {
   groupByTripId,
@@ -152,13 +152,27 @@ export async function createTrip(
       `INSERT INTO trips (id, user_id, title, city, country, start_date, end_date, days, approximate_cost, currency, rating, cover_image, notes, created_at)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)`,
       [
-        tripId, userId, input.title, input.city, input.country,
-        input.startDate, input.endDate, input.days, input.approximateCost,
-        input.currency, input.rating, input.coverImage, input.notes ?? null, createdAt,
+        tripId,
+        userId,
+        input.title,
+        input.city,
+        input.country,
+        input.startDate,
+        input.endDate,
+        input.days,
+        input.approximateCost,
+        input.currency,
+        input.rating,
+        input.coverImage,
+        input.notes ?? null,
+        createdAt,
       ],
     );
 
-    const attractions = input.attractions.map((p) => ({ ...p, type: "attraction" as const }));
+    const attractions = input.attractions.map((p) => ({
+      ...p,
+      type: "attraction" as const,
+    }));
     const cafes = input.cafes.map((p) => ({ ...p, type: "cafe" as const }));
     await insertPlaces(client, tripId, input.city, [...attractions, ...cafes]);
   });
@@ -195,7 +209,8 @@ export async function updateTrip(
     if (patch.startDate != null) append("start_date", patch.startDate);
     if (patch.endDate != null) append("end_date", patch.endDate);
     if (patch.days != null) append("days", patch.days);
-    if (patch.approximateCost != null) append("approximate_cost", patch.approximateCost);
+    if (patch.approximateCost != null)
+      append("approximate_cost", patch.approximateCost);
     if (patch.currency != null) append("currency", patch.currency);
     if (patch.rating != null) append("rating", patch.rating);
     if (patch.coverImage != null) append("cover_image", patch.coverImage);
@@ -212,9 +227,18 @@ export async function updateTrip(
     if (patch.attractions != null || patch.cafes != null) {
       await client.query(`DELETE FROM places WHERE trip_id = $1`, [tripId]);
       const cityFallback = patch.city ?? existing.rows[0].city;
-      const attractions = (patch.attractions ?? []).map((p) => ({ ...p, type: "attraction" as const }));
-      const cafes = (patch.cafes ?? []).map((p) => ({ ...p, type: "cafe" as const }));
-      await insertPlaces(client, tripId, cityFallback, [...attractions, ...cafes]);
+      const attractions = (patch.attractions ?? []).map((p) => ({
+        ...p,
+        type: "attraction" as const,
+      }));
+      const cafes = (patch.cafes ?? []).map((p) => ({
+        ...p,
+        type: "cafe" as const,
+      }));
+      await insertPlaces(client, tripId, cityFallback, [
+        ...attractions,
+        ...cafes,
+      ]);
     }
   });
 
@@ -243,7 +267,13 @@ export async function createComment(
     [commentId, tripId, authorId, normalizedMessage, createdAt],
   );
 
-  return { id: commentId, tripId, authorId, message: normalizedMessage, createdAt };
+  return {
+    id: commentId,
+    tripId,
+    authorId,
+    message: normalizedMessage,
+    createdAt,
+  };
 }
 
 export async function toggleTripLike(

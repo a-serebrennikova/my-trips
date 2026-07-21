@@ -1,3 +1,9 @@
+import { LoadingIndicator } from "@/components/layout/LoadingIndicator";
+
 export default function LoadingState() {
-  return <p className="text-sm text-slate-500">Loading users...</p>;
+  return (
+    <div className="flex min-h-[200px] items-center justify-center">
+      <LoadingIndicator message="Loading users..." />
+    </div>
+  );
 }

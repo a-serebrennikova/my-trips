@@ -8,7 +8,6 @@ if (!databaseUrl) {
 
 export const pool = new Pool({
   connectionString: databaseUrl,
-  ssl: { rejectUnauthorized: false },
 });
 
 const SLOW_QUERY_MS = Number(process.env.SLOW_QUERY_MS ?? "300");

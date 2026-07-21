@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { User } from "./travelStore";
+import type { User } from "@/types";
 
 type AuthState = {
   currentUser?: User;

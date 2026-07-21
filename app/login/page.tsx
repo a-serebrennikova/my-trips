@@ -6,7 +6,7 @@ export const dynamic = "force-dynamic";
 export default async function LoginPage() {
   return (
     <div className="mx-auto w-full max-w-md py-2">
-      <div className="glass-card space-y-6 bg-white/95 p-6 sm:p-8">
+      <div className="glass-card space-y-6 p-6 sm:p-8">
         <Link
           href={"/"}
           className="text-xs font-medium text-sky-700 hover:text-sky-600"

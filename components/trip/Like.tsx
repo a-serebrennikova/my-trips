@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useAuthStore } from "@/store/authStore";
 import { toggleTripLike } from "@/store/travelApi";
-import type { Trip } from "@/store/travelStore";
+import type { Trip } from "@/types";
 import { useRouter } from "next/navigation";
 
 interface Props {

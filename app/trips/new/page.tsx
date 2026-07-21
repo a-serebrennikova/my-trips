@@ -141,7 +141,7 @@ export default function NewTripPage() {
 
   return (
     <PageLayout>
-      <div className="glass-card space-y-5 bg-white/95 p-6 sm:p-8">
+      <div className="glass-card space-y-5 p-6 sm:p-8">
         <button
           type="button"
           onClick={() => router.back()}

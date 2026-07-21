@@ -4,8 +4,8 @@ import { PageLayout } from "@/components/layout/PageLayout";
 import { CommentFrom } from "@/components/trip/CommentForm";
 import { Like } from "@/components/trip/Like";
 import { ShareButton } from "@/components/trip/ShareButton";
-import { getTripById } from "@/src/db/trips";
-import { getUsers } from "@/src/db/users";
+import { getTripById } from "@/db/trips";
+import { getUsers } from "@/db/users";
 
 export const dynamic = "force-dynamic";
 
@@ -115,7 +115,7 @@ export default async function TripDetailPage({
 
   return (
     <PageLayout>
-      <div className="glass-card space-y-6 bg-white/95 p-5 sm:p-8">
+      <div className="glass-card space-y-6 p-5 sm:p-8">
         <Link
           href="/trips"
           className="inline-flex items-center gap-2 text-sm font-medium text-sky-700 transition hover:text-sky-500"
