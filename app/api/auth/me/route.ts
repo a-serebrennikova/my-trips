@@ -3,21 +3,19 @@ export const runtime = "nodejs";
 import { NextResponse } from "next/server";
 import { getUserById } from "@/db/users";
 import { getUserTravelData } from "@/db/trips";
-import { getBearerToken, verifyAuthToken } from "@/lib/auth";
+import { requireAuth } from "@/lib/api/auth";
+import { getRequestId, internalServerError, notFound } from "@/lib/api/errors";
 
 export async function GET(request: Request) {
+  const requestId = getRequestId(request);
+
   try {
-    const token = getBearerToken(
-      request.headers.get("authorization") ?? undefined,
-    );
-    if (!token) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const auth = requireAuth(request, requestId);
+    if (!auth.ok) {
+      return auth.response;
     }
 
-    const payload = verifyAuthToken(token);
-    if (!payload) {
-      return NextResponse.json({ error: "Invalid token" }, { status: 401 });
-    }
+    const payload = auth.payload;
 
     const [user, { trips }] = await Promise.all([
       getUserById(payload.userId),
@@ -25,7 +23,7 @@ export async function GET(request: Request) {
     ]);
 
     if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+      return notFound("User not found", requestId);
     }
 
     return NextResponse.json({
@@ -34,9 +32,6 @@ export async function GET(request: Request) {
       totalTrips: trips.length,
     });
   } catch {
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 },
-    );
+    return internalServerError(requestId);
   }
 }

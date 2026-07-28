@@ -1,34 +1,32 @@
 export const runtime = "nodejs";
 
 import { NextResponse } from "next/server";
-import { toggleTripLike } from "@/db/trips";
-import { getBearerToken, verifyAuthToken } from "@/lib/auth";
+import { getTripById, toggleTripLike } from "@/db/trips";
+import { requireAuth } from "@/lib/api/auth";
+import { getRequestId, internalServerError, notFound } from "@/lib/api/errors";
 
 export async function POST(
   request: Request,
   { params }: { params: Promise<{ tripId: string }> },
 ) {
-  try {
-    const token = getBearerToken(
-      request.headers.get("authorization") ?? undefined,
-    );
-    if (!token)
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const requestId = getRequestId(request);
 
-    const payload = verifyAuthToken(token);
-    if (!payload)
-      return NextResponse.json({ error: "Invalid token" }, { status: 401 });
+  try {
+    const auth = requireAuth(request, requestId);
+    if (!auth.ok) {
+      return auth.response;
+    }
+    const payload = auth.payload;
 
     const { tripId } = await params;
+    const existingTrip = await getTripById(tripId);
+    if (!existingTrip) return notFound("Trip not found", requestId);
+
     const trip = await toggleTripLike(tripId, payload.userId);
-    if (!trip)
-      return NextResponse.json({ error: "Trip not found" }, { status: 404 });
+    if (!trip) return notFound("Trip not found", requestId);
 
     return NextResponse.json(trip);
   } catch {
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 },
-    );
+    return internalServerError(requestId);
   }
 }

@@ -1,40 +1,55 @@
 export const runtime = "nodejs";
 
 import { NextResponse } from "next/server";
-import { createComment } from "@/db/trips";
-import { getBearerToken, verifyAuthToken } from "@/lib/auth";
+import z from "zod";
+import { createComment, getTripById } from "@/db/trips";
+import { requireAuth } from "@/lib/api/auth";
+import {
+  badRequest,
+  getRequestId,
+  internalServerError,
+  notFound,
+} from "@/lib/api/errors";
+
+const commentSchema = z.object({
+  message: z.string().trim().min(1).max(400),
+});
 
 export async function POST(
   request: Request,
   { params }: { params: Promise<{ tripId: string }> },
 ) {
-  try {
-    const token = getBearerToken(
-      request.headers.get("authorization") ?? undefined,
-    );
-    if (!token)
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const requestId = getRequestId(request);
 
-    const payload = verifyAuthToken(token);
-    if (!payload)
-      return NextResponse.json({ error: "Invalid token" }, { status: 401 });
+  try {
+    const auth = requireAuth(request, requestId);
+    if (!auth.ok) {
+      return auth.response;
+    }
+    const payload = auth.payload;
 
     const { tripId } = await params;
-    const body = (await request.json()) as { message?: string };
+    const trip = await getTripById(tripId);
+    if (!trip) return notFound("Trip not found", requestId);
 
-    if (!body.message?.trim()) {
-      return NextResponse.json(
-        { error: "Message is required" },
-        { status: 400 },
+    const body = await request.json();
+    const parsedBody = commentSchema.safeParse(body);
+
+    if (!parsedBody.success) {
+      return badRequest(
+        "Invalid request body",
+        requestId,
+        parsedBody.error.flatten(),
       );
     }
 
-    const comment = await createComment(tripId, payload.userId, body.message);
+    const comment = await createComment(
+      tripId,
+      payload.userId,
+      parsedBody.data.message,
+    );
     return NextResponse.json(comment, { status: 201 });
   } catch {
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 },
-    );
+    return internalServerError(requestId);
   }
 }

@@ -1,26 +1,59 @@
 export const runtime = "nodejs";
 
 import { NextResponse } from "next/server";
+import z from "zod";
 import { getTripById, updateTrip, deleteTrip } from "@/db/trips";
-import { getBearerToken, verifyAuthToken } from "@/lib/auth";
-import type { Trip } from "@/types";
+import { requireAuth } from "@/lib/api/auth";
+import {
+  badRequest,
+  forbidden,
+  getRequestId,
+  internalServerError,
+  notFound,
+} from "@/lib/api/errors";
+
+const placeSchema = z.object({
+  id: z.string().trim().min(1),
+  name: z.string().trim().min(1).max(140),
+  city: z.string().trim().max(140),
+  note: z.string().trim().max(800).optional(),
+});
+
+const tripPatchSchema = z
+  .object({
+    title: z.string().trim().min(3).max(160).optional(),
+    city: z.string().trim().min(2).max(120).optional(),
+    country: z.string().trim().min(2).max(120).optional(),
+    startDate: z.string().trim().min(1).optional(),
+    endDate: z.string().trim().min(1).optional(),
+    days: z.number().int().min(1).max(3650).optional(),
+    approximateCost: z.number().min(0).optional(),
+    currency: z.enum(["RUB", "EUR", "USD", "₽", "€", "$"]).optional(),
+    rating: z.number().int().min(1).max(5).optional(),
+    coverImage: z.string().trim().max(2048).optional(),
+    notes: z.string().trim().max(4000).optional(),
+    attractions: z.array(placeSchema).optional(),
+    cafes: z.array(placeSchema).optional(),
+  })
+  .refine((value) => Object.keys(value).length > 0, {
+    message: "At least one field must be provided",
+  });
 
 export async function GET(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ tripId: string }> },
 ) {
+  const requestId = getRequestId(request);
+
   try {
     const { tripId } = await params;
     const trip = await getTripById(tripId);
     if (!trip) {
-      return NextResponse.json({ error: "Trip not found" }, { status: 404 });
+      return notFound("Trip not found", requestId);
     }
     return NextResponse.json(trip);
   } catch {
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 },
-    );
+    return internalServerError(requestId);
   }
 }
 
@@ -28,33 +61,37 @@ export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ tripId: string }> },
 ) {
-  try {
-    const token = getBearerToken(
-      request.headers.get("authorization") ?? undefined,
-    );
-    if (!token)
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const requestId = getRequestId(request);
 
-    const payload = verifyAuthToken(token);
-    if (!payload)
-      return NextResponse.json({ error: "Invalid token" }, { status: 401 });
+  try {
+    const auth = requireAuth(request, requestId);
+    if (!auth.ok) {
+      return auth.response;
+    }
+    const payload = auth.payload;
 
     const { tripId } = await params;
     const existing = await getTripById(tripId);
-    if (!existing)
-      return NextResponse.json({ error: "Trip not found" }, { status: 404 });
+    if (!existing) return notFound("Trip not found", requestId);
     if (existing.userId !== payload.userId) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      return forbidden("Forbidden", requestId);
     }
 
-    const patch = (await request.json()) as Partial<Trip>;
-    const updated = await updateTrip(tripId, patch);
+    const body = await request.json();
+    const parsedPatch = tripPatchSchema.safeParse(body);
+
+    if (!parsedPatch.success) {
+      return badRequest(
+        "Invalid request body",
+        requestId,
+        parsedPatch.error.flatten(),
+      );
+    }
+
+    const updated = await updateTrip(tripId, parsedPatch.data);
     return NextResponse.json(updated);
   } catch {
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 },
-    );
+    return internalServerError(requestId);
   }
 }
 
@@ -62,31 +99,25 @@ export async function DELETE(
   request: Request,
   { params }: { params: Promise<{ tripId: string }> },
 ) {
-  try {
-    const token = getBearerToken(
-      request.headers.get("authorization") ?? undefined,
-    );
-    if (!token)
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const requestId = getRequestId(request);
 
-    const payload = verifyAuthToken(token);
-    if (!payload)
-      return NextResponse.json({ error: "Invalid token" }, { status: 401 });
+  try {
+    const auth = requireAuth(request, requestId);
+    if (!auth.ok) {
+      return auth.response;
+    }
+    const payload = auth.payload;
 
     const { tripId } = await params;
     const existing = await getTripById(tripId);
-    if (!existing)
-      return NextResponse.json({ error: "Trip not found" }, { status: 404 });
+    if (!existing) return notFound("Trip not found", requestId);
     if (existing.userId !== payload.userId) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      return forbidden("Forbidden", requestId);
     }
 
     await deleteTrip(tripId);
     return new NextResponse(null, { status: 204 });
   } catch {
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 },
-    );
+    return internalServerError(requestId);
   }
 }
