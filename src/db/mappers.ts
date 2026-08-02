@@ -1,5 +1,31 @@
-import type { Comment, Place, Trip, User } from "@/src/types";
+import {
+  CURRENCY,
+  type Comment,
+  type Currency,
+  type Place,
+  type Trip,
+  type User,
+} from "@/src/types";
 import type { DbComment, DbPlace, DbTrip, DbTripLike, DbUser } from "./types";
+
+const CURRENCY_SYMBOL_TO_CODE: Record<string, Currency> = {
+  "₽": "RUB",
+  "€": "EUR",
+  $: "USD",
+};
+
+function mapDbCurrencyToCurrency(value: string): Currency {
+  if (value in CURRENCY) {
+    return value as Currency;
+  }
+
+  const mapped = CURRENCY_SYMBOL_TO_CODE[value];
+  if (mapped) {
+    return mapped;
+  }
+
+  return "RUB";
+}
 
 export function groupByTripId<T extends { trip_id: string }>(
   items: T[],
@@ -62,7 +88,7 @@ export function mapDbTripToTrip(
     endDate: db.end_date,
     days: db.days,
     approximateCost: db.approximate_cost,
-    currency: db.currency as Trip["currency"],
+    currency: mapDbCurrencyToCurrency(db.currency),
     rating: db.rating,
     coverImage: db.cover_image,
     notes: db.notes ?? undefined,
@@ -88,7 +114,7 @@ export function mapDbTripToTripPreview(
     endDate: db.end_date,
     days: db.days,
     approximateCost: db.approximate_cost,
-    currency: db.currency as Trip["currency"],
+    currency: mapDbCurrencyToCurrency(db.currency),
     rating: db.rating,
     coverImage: db.cover_image,
     notes: db.notes ?? undefined,

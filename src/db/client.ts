@@ -11,7 +11,7 @@ export const pool = new Pool({
   ssl: { rejectUnauthorized: false },
 });
 
-const SLOW_QUERY_MS = Number(process.env.SLOW_QUERY_MS ?? "300");
+const SLOW_QUERY_MS = Number(process.env.SLOW_QUERY_MS ?? "1000");
 
 function compactSql(sql: string): string {
   return sql.replace(/\s+/g, " ").trim();
