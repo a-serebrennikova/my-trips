@@ -21,6 +21,15 @@ export type Comment = {
   createdAt: string;
 };
 
+export const CURRENCY = {
+  RUB: "₽",
+  EUR: "€",
+  USD: "$",
+} as const;
+
+export type Currency = keyof typeof CURRENCY;
+export type CurrencySymbol = (typeof CURRENCY)[Currency];
+
 export type Trip = {
   id: string;
   userId: string;
@@ -31,7 +40,7 @@ export type Trip = {
   endDate: string;
   days: number;
   approximateCost: number;
-  currency: "RUB" | "EUR" | "USD" | "₽" | "€" | "$";
+  currency: Currency;
   rating: number;
   coverImage: string;
   notes?: string;
