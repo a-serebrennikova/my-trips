@@ -1,7 +1,8 @@
 export const appConfig = {
   appName: "myTrips",
   appDescription: "Your travel stories",
-  headerHeight: 64,
+  headerHeight: 66,
+  defaultUserId: "u1",
   routes: [
     {
       href: "/",

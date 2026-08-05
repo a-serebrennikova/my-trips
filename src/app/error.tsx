@@ -9,9 +9,9 @@ type ErrorPageProps = {
 
 export default function Error({ reset }: ErrorPageProps) {
   return (
-    <Card className="flex flex-col flex-1items-center justify-center gap-4 p-8 text-center">
+    <Card className="flex flex-col flex-1 items-center justify-center gap-4 p-8 text-center">
       <h1 className="page-title">Error</h1>
-      <Button onClick={reset}>Try again</Button>
+      <Button onClick={reset} style={{ width: "150px" }}>Try again</Button>
     </Card>
   );
 }

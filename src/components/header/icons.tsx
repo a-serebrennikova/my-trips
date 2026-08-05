@@ -1,18 +1,10 @@
 import { ReactElement } from "react";
+import { TripsIcon } from "../common/icons/TripsIcon";
 
 export const HomeIcon = () => (
   <svg viewBox="0 0 24 24" fill="none" className="h-4 w-4 shrink-0">
     <path
       d="M4 11.2 12 4l8 7.2V20a1 1 0 0 1-1 1h-4.8v-5.2H9.8V21H5a1 1 0 0 1-1-1v-8.8Z"
-      fill="currentColor"
-    />
-  </svg>
-);
-
-export const TripsIcon = () => (
-  <svg viewBox="0 0 24 24" fill="none" className="h-4 w-4 shrink-0">
-    <path
-      d="M2.6 11.8 21 3.7 15.8 12 21 20.3 2.6 12.2v-.4Zm6.7-.8L17 6.4l-4.4 4.3 4.4 4.3-7.7-4Z"
       fill="currentColor"
     />
   </svg>
