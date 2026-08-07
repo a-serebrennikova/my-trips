@@ -6,6 +6,8 @@ import { getFriendProfileData } from "@/src/db/trips";
 import Link from "next/link";
 import { Text } from "@radix-ui/themes";
 import notFound from "../../not-found";
+import { Divider } from "@/src/components/Divider";
+import { getStats } from "@/src/utils/getStats";
 
 export default async function FriendProfilePage({
   params,
@@ -20,29 +22,12 @@ export default async function FriendProfilePage({
   }
 
   const { user, trips: userTrips, stats: profileStats } = profileData;
-  const { avgRating, countriesCount, likesReceived, tripsCount } = profileStats;
 
-  const stats: UserProfileStat[] = [
-    { label: "Trips", value: tripsCount, color: "cyan" },
-    { label: "Likes", value: likesReceived, color: "teal" },
-    { label: "Countries", value: countriesCount, color: "sky" },
-    {
-      label: "Average rating",
-      value: avgRating ?? "---",
-      color: "amber",
-    },
-  ];
-
-  if (profileStats.avgRating) {
-    stats.splice(1, 0, {
-      label: "Average rating",
-      value: profileStats.avgRating,
-    });
-  }
+  const stats: UserProfileStat[] = getStats(profileStats);
 
   return (
     <>
-      <Card>
+      <Card className="flex flex-col gap-4">
         <Link
           href="/friends"
           className="inline-flex items-center gap-2 text-standard font-medium text-sky-700 transition hover:text-sky-500"
@@ -54,11 +39,10 @@ export default async function FriendProfilePage({
       </Card>
 
       <section>
+        <Divider title={"Trips"} />
+
         {userTrips.length === 0 ? (
-          <Text
-            as="p"
-            className="card-surface px-6 py-12 text-center text-standard text-slate-500"
-          >
+          <Text as="p" className="text-standard text-slate-500">
             This friend does not have any saved trips yet.
           </Text>
         ) : (

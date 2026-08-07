@@ -11,7 +11,6 @@ export type DbFriendProfileStatsRow = {
   trips_count: number | string;
   likes_received: number | string;
   countries_count: number | string;
-  avg_rating: string | number | null;
   latest_trip_date: string | null;
 };
 
@@ -26,11 +25,10 @@ export type FriendProfileStats = {
   tripsCount: number;
   likesReceived: number;
   countriesCount: number;
-  avgRating: string | null;
   latestTripDate: string | null;
 };
 
-export type FriendProfileData = {
+export type UserProfileData = {
   user: User;
   trips: Trip[];
   stats: FriendProfileStats;

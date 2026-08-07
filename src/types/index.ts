@@ -6,6 +6,12 @@ export type User = {
   homeCity: string;
 };
 
+export type AuthorInfo = {
+  id: string;
+  name: string;
+  avatarColor: string;
+};
+
 export type Place = {
   id: string;
   name: string;
@@ -17,6 +23,7 @@ export type Comment = {
   id: string;
   tripId: string;
   authorId: string;
+  author: AuthorInfo;
   message: string;
   createdAt: string;
 };
@@ -33,6 +40,7 @@ export type CurrencySymbol = (typeof CURRENCY)[Currency];
 export type Trip = {
   id: string;
   userId: string;
+  author: AuthorInfo;
   title: string;
   city: string;
   country: string;
@@ -41,8 +49,6 @@ export type Trip = {
   days: number;
   approximateCost: number;
   currency: Currency;
-  rating: number;
-  coverImage: string;
   notes?: string;
   attractions: Place[];
   cafes: Place[];

@@ -1,11 +1,16 @@
+"use client";
+
+import { TagsColors } from "@/src/consts/tags";
 import type { User } from "@/src/types";
 import { getNameLetter } from "@/src/utils/getNameLetter";
+import { EmailIcon } from "./icons/Email";
+import { LocationPinIcon } from "./icons/LocationPin";
 import { Avatar, Badge } from "@radix-ui/themes";
 
 export type UserProfileStat = {
   label: string;
   value: string | number;
-  color?: "cyan" | "teal" | "sky" | "amber" | "red" | "green";
+  color?: TagsColors;
 };
 
 type UserProfileHeaderProps = {
@@ -15,29 +20,37 @@ type UserProfileHeaderProps = {
 
 export const UserProfileHeader = ({ user, stats }: UserProfileHeaderProps) => {
   return (
-    <section className="flex flex-col gap-5 rounded-3xl p-3 lg:flex-row lg:items-start lg:justify-between">
-      <div className="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-start">
-        <Avatar fallback={getNameLetter(user.name)} color="grass" />
-
-        <div className="min-w-0 flex-1">
-          <h1 className="text-medium font-semibold tracking-tight text-slate-900 sm:text-title">
+    <section className="flex lg:flex-row justify-between">
+      <div className="flex flex-col gap-4 sm:items-start">
+        <div className="flex items-center gap-4">
+          <Avatar
+            fallback={getNameLetter(user.name)}
+            color="grass"
+            size="6"
+            radius="large"
+          />
+          <h1 className="text-3xl font-semibold tracking-tight text-slate-900 sm:text-title">
             {user.name}
           </h1>
-
-          <p className="mt-1 text-standard text-slate-500">{user.email}</p>
-
-          <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-standard text-slate-600">
-            {user.homeCity ? <span>{user.homeCity}</span> : null}
-          </div>
+        </div>
+        <div className="flex items-center gap-3">
+          <EmailIcon className="h-4 w-4" />
+          <span className="text-standard text-slate-700">{user.email}</span>
+        </div>
+        <div className="flex items-center gap-3">
+          <LocationPinIcon className="h-4 w-4" />
+          <span className="text-standard text-slate-700">{user.homeCity}</span>
         </div>
       </div>
 
-      <div className="flex flex-wrap gap-2 lg:justify-end">
-        {stats.map(({ label, value, color }) => (
-          <Badge key={`label-${color}`} color={color} size="1">
-            {label}: {value}
-          </Badge>
-        ))}
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-wrap gap-2 lg:justify-end">
+          {stats.map(({ label, value, color }) => (
+            <Badge key={`label-${color}`} color={color} size="1">
+              {label}: {value}
+            </Badge>
+          ))}
+        </div>
       </div>
     </section>
   );

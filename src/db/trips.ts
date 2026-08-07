@@ -12,17 +12,17 @@ import {
 import {
   type DbFriendProfileStatsRow,
   type DbFriendSummaryRow,
-  type FriendProfileData,
+  type UserProfileData,
   type FriendSummary,
   READ_MODEL_REVALIDATE_SECONDS,
 } from "./read-models";
 import {
-  type DbComment,
+  type DbCommentWithAuthor,
   type DbPlace,
   type DbTrip,
   type DbTripLike,
+  type DbTripWithAuthor,
   type DbUser,
-  TRIP_SELECT_COLUMNS,
   USER_PUBLIC_SELECT_COLUMNS,
 } from "./types";
 
@@ -30,7 +30,7 @@ async function loadTripsByQuery(
   tripSql: string,
   params: unknown[],
 ): Promise<Trip[]> {
-  const tripResult = await query<DbTrip>(tripSql, params);
+  const tripResult = await query<DbTripWithAuthor>(tripSql, params);
   const trips = tripResult.rows;
   if (trips.length === 0) return [];
 
@@ -41,8 +41,11 @@ async function loadTripsByQuery(
       `SELECT id, name, city, note, trip_id, type FROM places WHERE trip_id = ANY($1::text[])`,
       [tripIds],
     ),
-    query<DbComment>(
-      `SELECT id, trip_id, author_id, message, created_at FROM comments WHERE trip_id = ANY($1::text[])`,
+    query<DbCommentWithAuthor>(
+      `SELECT c.id, c.trip_id, c.author_id, c.message, c.created_at, u.name as author_name, u.avatar_color
+       FROM comments c
+       LEFT JOIN users u ON c.author_id = u.id
+       WHERE c.trip_id = ANY($1::text[])`,
       [tripIds],
     ),
     query<DbTripLike>(
@@ -69,7 +72,7 @@ async function loadTripPreviewsByQuery(
   tripSql: string,
   params: unknown[],
 ): Promise<Trip[]> {
-  const tripResult = await query<DbTrip>(tripSql, params);
+  const tripResult = await query<DbTripWithAuthor>(tripSql, params);
   const trips = tripResult.rows;
   if (trips.length === 0) return [];
 
@@ -110,11 +113,27 @@ async function insertPlaces(
   }
 }
 
+type TripWriteInput = {
+  title: string;
+  city: string;
+  country: string;
+  startDate: string;
+  endDate: string;
+  days: number;
+  approximateCost: number;
+  currency: Trip["currency"];
+  notes?: string;
+  attractions: Place[];
+  cafes: Place[];
+};
+
 export async function getUserTravelData(
   userId: string,
 ): Promise<{ trips: Trip[] }> {
   const trips = await loadTripsByQuery(
-    `SELECT ${TRIP_SELECT_COLUMNS} FROM trips WHERE user_id = $1 ORDER BY created_at DESC`,
+    `SELECT trips.id, trips.user_id, trips.title, trips.city, trips.country, trips.start_date, trips.end_date, trips.days, trips.approximate_cost, trips.currency, trips.notes, trips.created_at, u.name as author_name, u.avatar_color FROM trips 
+     LEFT JOIN users u ON trips.user_id = u.id 
+     WHERE trips.user_id = $1 ORDER BY trips.created_at DESC`,
     [userId],
   );
   return { trips };
@@ -128,7 +147,9 @@ async function getAllTravelDataRaw(
     query<DbUser>(`SELECT ${USER_PUBLIC_SELECT_COLUMNS} FROM users`),
     query<{ count: string }>(`SELECT COUNT(*)::text AS count FROM trips`),
     loadTripPreviewsByQuery(
-      `SELECT ${TRIP_SELECT_COLUMNS} FROM trips ORDER BY created_at DESC LIMIT $1 OFFSET $2`,
+      `SELECT trips.id, trips.user_id, trips.title, trips.city, trips.country, trips.start_date, trips.end_date, trips.days, trips.approximate_cost, trips.currency, trips.notes, trips.created_at, u.name as author_name, u.avatar_color FROM trips
+       LEFT JOIN users u ON trips.user_id = u.id
+       ORDER BY trips.created_at DESC LIMIT $1 OFFSET $2`,
       [limit, offset],
     ),
   ]);
@@ -142,7 +163,9 @@ async function getAllTravelDataRaw(
 
 async function getTripByIdRaw(tripId: string): Promise<Trip | undefined> {
   const trips = await loadTripsByQuery(
-    `SELECT ${TRIP_SELECT_COLUMNS} FROM trips WHERE id = $1 LIMIT 1`,
+    `SELECT trips.id, trips.user_id, trips.title, trips.city, trips.country, trips.start_date, trips.end_date, trips.days, trips.approximate_cost, trips.currency, trips.notes, trips.created_at, u.name as author_name, u.avatar_color FROM trips
+     LEFT JOIN users u ON trips.user_id = u.id
+     WHERE trips.id = $1 LIMIT 1`,
     [tripId],
   );
   return trips[0];
@@ -191,19 +214,21 @@ async function getFriendsSummaryRaw(
 
 async function getFriendProfileDataRaw(
   userId: string,
-): Promise<FriendProfileData | null> {
+): Promise<UserProfileData | null> {
   const [userResult, trips, statsResult] = await Promise.all([
     query<DbUser>(
       `SELECT ${USER_PUBLIC_SELECT_COLUMNS} FROM users WHERE id = $1 LIMIT 1`,
       [userId],
     ),
     loadTripPreviewsByQuery(
-      `SELECT ${TRIP_SELECT_COLUMNS} FROM trips WHERE user_id = $1 ORDER BY created_at DESC`,
+      `SELECT trips.id, trips.user_id, trips.title, trips.city, trips.country, trips.start_date, trips.end_date, trips.days, trips.approximate_cost, trips.currency, trips.notes, trips.created_at, u.name as author_name, u.avatar_color FROM trips
+       LEFT JOIN users u ON trips.user_id = u.id
+       WHERE trips.user_id = $1 ORDER BY trips.created_at DESC`,
       [userId],
     ),
     query<DbFriendProfileStatsRow>(
       `WITH user_trips AS (
-         SELECT id, country, rating, start_date
+         SELECT id, country, start_date
          FROM trips
          WHERE user_id = $1
        )
@@ -215,7 +240,6 @@ async function getFriendProfileDataRaw(
            INNER JOIN user_trips ut ON ut.id = tl.trip_id
          ) AS likes_received,
          (SELECT COUNT(DISTINCT country)::int FROM user_trips) AS countries_count,
-         (SELECT ROUND(AVG(rating)::numeric, 1) FROM user_trips) AS avg_rating,
          (SELECT MAX(start_date) FROM user_trips) AS latest_trip_date`,
       [userId],
     ),
@@ -227,7 +251,6 @@ async function getFriendProfileDataRaw(
   }
 
   const statsRow = statsResult.rows[0];
-  const avgRating = statsRow.avg_rating;
 
   return {
     user: mapDbUserToUser(user),
@@ -236,7 +259,6 @@ async function getFriendProfileDataRaw(
       tripsCount: Number(statsRow.trips_count) || 0,
       likesReceived: Number(statsRow.likes_received) || 0,
       countriesCount: Number(statsRow.countries_count) || 0,
-      avgRating: avgRating == null ? null : String(avgRating),
       latestTripDate: statsRow.latest_trip_date,
     },
   };
@@ -266,15 +288,15 @@ export const getFriendProfileData = unstable_cache(
 
 export async function createTrip(
   userId: string,
-  input: Omit<Trip, "id" | "userId" | "createdAt" | "likedByUserIds">,
+  input: TripWriteInput,
 ): Promise<Trip> {
   const tripId = randomUUID();
   const createdAt = new Date().toISOString();
 
   await withTransaction(async (client) => {
     await client.query(
-      `INSERT INTO trips (id, user_id, title, city, country, start_date, end_date, days, approximate_cost, currency, rating, cover_image, notes, created_at)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)`,
+      `INSERT INTO trips (id, user_id, title, city, country, start_date, end_date, days, approximate_cost, currency, notes, created_at)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`,
       [
         tripId,
         userId,
@@ -286,8 +308,6 @@ export async function createTrip(
         input.days,
         input.approximateCost,
         input.currency,
-        input.rating,
-        input.coverImage,
         input.notes ?? null,
         createdAt,
       ],
@@ -336,8 +356,6 @@ export async function updateTrip(
     if (patch.approximateCost != null)
       append("approximate_cost", patch.approximateCost);
     if (patch.currency != null) append("currency", patch.currency);
-    if (patch.rating != null) append("rating", patch.rating);
-    if (patch.coverImage != null) append("cover_image", patch.coverImage);
     if (patch.notes != null) append("notes", patch.notes);
 
     if (updates.length > 0) {
@@ -370,11 +388,18 @@ export async function updateTrip(
 }
 
 export async function deleteTrip(tripId: string): Promise<boolean> {
-  const result = await query<{ id: string }>(
-    `DELETE FROM trips WHERE id = $1 RETURNING id`,
-    [tripId],
-  );
-  return (result.rowCount ?? 0) > 0;
+  return await withTransaction(async (client) => {
+    await client.query(`DELETE FROM trip_likes WHERE trip_id = $1`, [tripId]);
+    await client.query(`DELETE FROM comments WHERE trip_id = $1`, [tripId]);
+    await client.query(`DELETE FROM places WHERE trip_id = $1`, [tripId]);
+
+    const result = await client.query<{ id: string }>(
+      `DELETE FROM trips WHERE id = $1 RETURNING id`,
+      [tripId],
+    );
+
+    return (result.rowCount ?? 0) > 0;
+  });
 }
 
 export async function createComment(
@@ -391,10 +416,23 @@ export async function createComment(
     [commentId, tripId, authorId, normalizedMessage, createdAt],
   );
 
+  // Fetch author info
+  const userResult = await query<DbUser>(
+    `SELECT id, name, avatar_color FROM users WHERE id = $1 LIMIT 1`,
+    [authorId],
+  );
+
+  const author = userResult.rows[0];
+
   return {
     id: commentId,
     tripId,
     authorId,
+    author: {
+      id: authorId,
+      name: author?.name || "Unknown",
+      avatarColor: author?.avatar_color || "gray",
+    },
     message: normalizedMessage,
     createdAt,
   };
@@ -403,7 +441,7 @@ export async function createComment(
 export async function toggleTripLike(
   tripId: string,
   userId: string,
-): Promise<Trip | undefined> {
+): Promise<string[]> {
   await withTransaction(async (client) => {
     const existing = await client.query<DbTripLike>(
       `SELECT trip_id, user_id FROM trip_likes WHERE trip_id = $1 AND user_id = $2 LIMIT 1`,
@@ -423,5 +461,9 @@ export async function toggleTripLike(
     }
   });
 
-  return getTripByIdRaw(tripId);
+  const result = await query<Pick<DbTripLike, "user_id">>(
+    `SELECT user_id FROM trip_likes WHERE trip_id = $1`,
+    [tripId],
+  );
+  return result.rows.map((r) => r.user_id);
 }

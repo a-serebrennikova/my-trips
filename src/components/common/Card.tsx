@@ -7,7 +7,7 @@ export const Card = ({
   children: React.ReactNode;
   className?: string;
 }) => {
-  const classes = ["card-surface flex! flex-col", className].join(" ");
+  const classes = ["rounded-4xl bg-(--brand-200) flex! flex-col", className].join(" ");
 
   return (
     <RadixCard className={classes} size="3">

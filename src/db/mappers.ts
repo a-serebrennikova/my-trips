@@ -6,7 +6,13 @@ import {
   type Trip,
   type User,
 } from "@/src/types";
-import type { DbComment, DbPlace, DbTrip, DbTripLike, DbUser } from "./types";
+import type {
+  DbCommentWithAuthor,
+  DbPlace,
+  DbTripLike,
+  DbTripWithAuthor,
+  DbUser,
+} from "./types";
 
 const CURRENCY_SYMBOL_TO_CODE: Record<string, Currency> = {
   "₽": "RUB",
@@ -25,6 +31,18 @@ function mapDbCurrencyToCurrency(value: string): Currency {
   }
 
   return "RUB";
+}
+
+function mapDbAuthorInfo(
+  id: string,
+  name?: string | null,
+  avatarColor?: string | null,
+) {
+  return {
+    id,
+    name: name || "Unknown",
+    avatarColor: avatarColor || "gray",
+  };
 }
 
 export function groupByTripId<T extends { trip_id: string }>(
@@ -56,21 +74,26 @@ export function mapDbPlacesToPlaces(
     }));
 }
 
-export function mapDbCommentsToComments(commentsRows: DbComment[]): Comment[] {
-  return commentsRows.map((c) => ({
-    id: c.id,
-    tripId: c.trip_id,
-    authorId: c.author_id,
-    message: c.message,
-    createdAt: c.created_at,
-  }));
+export function mapDbCommentsToComments(
+  commentsRows: DbCommentWithAuthor[],
+): Comment[] {
+  return commentsRows
+    .filter((c) => c.author_id && c.author_name) // Filter out comments with deleted authors
+    .map((c) => ({
+      id: c.id,
+      tripId: c.trip_id,
+      authorId: c.author_id,
+      author: mapDbAuthorInfo(c.author_id, c.author_name, c.avatar_color),
+      message: c.message,
+      createdAt: c.created_at,
+    }));
 }
 
 export function mapDbTripToTrip(
-  db: DbTrip,
+  db: DbTripWithAuthor,
   related: {
     places: DbPlace[];
-    comments: DbComment[];
+    comments: DbCommentWithAuthor[];
     likes: DbTripLike[];
   },
 ): Trip {
@@ -81,6 +104,7 @@ export function mapDbTripToTrip(
   return {
     id: db.id,
     userId: db.user_id,
+    author: mapDbAuthorInfo(db.user_id, db.author_name, db.avatar_color),
     title: db.title,
     city: db.city,
     country: db.country,
@@ -89,8 +113,6 @@ export function mapDbTripToTrip(
     days: db.days,
     approximateCost: db.approximate_cost,
     currency: mapDbCurrencyToCurrency(db.currency),
-    rating: db.rating,
-    coverImage: db.cover_image,
     notes: db.notes ?? undefined,
     attractions,
     cafes,
@@ -101,12 +123,13 @@ export function mapDbTripToTrip(
 }
 
 export function mapDbTripToTripPreview(
-  db: DbTrip,
+  db: DbTripWithAuthor,
   related: { likes: DbTripLike[] },
 ): Trip {
   return {
     id: db.id,
     userId: db.user_id,
+    author: mapDbAuthorInfo(db.user_id, db.author_name, db.avatar_color),
     title: db.title,
     city: db.city,
     country: db.country,
@@ -115,8 +138,6 @@ export function mapDbTripToTripPreview(
     days: db.days,
     approximateCost: db.approximate_cost,
     currency: mapDbCurrencyToCurrency(db.currency),
-    rating: db.rating,
-    coverImage: db.cover_image,
     notes: db.notes ?? undefined,
     attractions: [],
     cafes: [],

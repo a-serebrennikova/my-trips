@@ -4,9 +4,7 @@ import { getNameLetter } from "@/src/utils/getNameLetter";
 import { formatAmount } from "@/src/utils/formatAmount";
 import { Avatar, Badge } from "@radix-ui/themes";
 import Link from "next/link";
-
-import { ratingFormatter } from "@/src/utils/ratingFormatter";
-const MAX_RATING = 5;
+import { tagsColor } from "@/src/consts/tags";
 
 interface TripCardItemProps {
   trip: Trip;
@@ -17,28 +15,23 @@ const TripTags = ({
   city,
   country,
   days,
-  rating,
   cost,
   currency,
 }: {
   city: string;
   country: string;
   days: number;
-  rating: number;
   cost: number;
   currency: Currency;
 }) => (
   <div className="flex flex-wrap gap-1.5 text-small">
-    <Badge size="1" color="indigo">
+    <Badge size="1" color={tagsColor.city}>
       {city},&nbsp;{country}
     </Badge>
-    <Badge size="1" color="blue">
+    <Badge size="1" color={tagsColor.days}>
       {days}&nbsp;days
     </Badge>
-    <Badge size="1" color="orange">
-      {ratingFormatter.format(rating)}&nbsp;/&nbsp;{MAX_RATING}
-    </Badge>
-    <Badge size="1" color="teal">
+    <Badge size="1" color={tagsColor.cost}>
       {formatAmount(cost, currency)}
     </Badge>
   </div>
@@ -66,12 +59,11 @@ export const TripCardItem = ({ trip, author }: TripCardItemProps) => (
         city={trip.city}
         country={trip.country}
         days={trip.days}
-        rating={trip.rating}
         cost={trip.approximateCost}
         currency={trip.currency}
       />
       <div className="flex flex-col gap-2">
-        <h3 className="display-title mt-2 text-medium text-slate-900">
+        <h3 className="display-title mt-2 page-title text-slate-900">
           {trip.title}
         </h3>
 

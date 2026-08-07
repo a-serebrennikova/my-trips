@@ -14,11 +14,14 @@
   --brand-600: #0e9a8c;
   --brand-700: #0f7d73;
   --brand-800: #11635d;
+  --orange-a3: #ff9c0029;
+  --orange-a11: #cc4e00;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-text-50: var(--text-color-50);
   --font-sans: var(--font-space-grotesk), "Avenir Next", sans-serif;
   --font-display: var(--font-space-grotesk), "Avenir Next", sans-serif;
   --font-mono:
@@ -32,24 +35,16 @@ body {
   color: var(--foreground);
 }
 
-.card-surface,
-.glass-card {
-  @apply rounded-4xl bg-(--brand-200);
-}
-
 .pill {
   @apply rounded-full bg-teal-50 px-3 py-1 font-semibold uppercase tracking-[0.12em] text-teal-700;
   font-size: 0.875rem;
   line-height: 1.4;
 }
 
-.profile-surface {
-  @apply rounded-4xl p-4 sm:p-6;
-  background-color: var(--brand-200);
-}
-
-.profile-surface .glass-card {
-  @apply bg-transparent ring-0;
+.text-small {
+  font-size: 0.875rem;
+  line-height: 1.4;
+  font-weight: 500;
 }
 
 .page-title {
@@ -60,26 +55,44 @@ body {
   font-family: var(--font-space-grotesk), "Avenir Next", sans-serif;
 }
 
-.text-medium {
-  font-size: clamp(1.15rem, 3vw, 1.5rem);
-  line-height: 1.15;
-  font-weight: 600;
-}
-
 .text-standard {
+  @apply text-slate-900;
   font-size: 1rem;
   line-height: 1.5;
   font-weight: 500;
+  font-family: var(--font-space-grotesk), "Avenir Next", sans-serif;
 }
 
 .text-small {
+  @apply text-slate-900;
   font-size: 0.875rem;
   line-height: 1.4;
   font-weight: 500;
+  font-family: var(--font-space-grotesk), "Avenir Next", sans-serif;
+}
+
+.card-title {
+  @apply text-(--orange-a11);
+  font-size: 1rem;
+  line-height: 1.5;
+  font-weight: 500;
+  font-family: var(--font-space-grotesk), "Avenir Next", sans-serif;
 }
 
 .btn-primary-pill {
   @apply inline-flex items-center justify-center gap-2 rounded-full bg-teal-600 px-5 py-2.5 font-semibold text-white transition hover:bg-teal-500;
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+
+.link-primary {
+  @apply bg-teal-50 text-teal-700;
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+
+.link-ordinary {
+  @apply text-teal-50 hover:bg-teal-50 hover:text-teal-700;
   font-size: 0.875rem;
   line-height: 1.4;
 }

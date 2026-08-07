@@ -18,7 +18,7 @@ export const AppInfo = () => {
             Add cities, impressions, favorite cafes, and share them with
             friends.
             <br />
-            Every trip is its own story with ratings, notes, and comments.
+            Every trip is its own story with likes, notes, and comments.
           </LeadText>
 
           <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap">

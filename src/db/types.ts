@@ -9,10 +9,13 @@ export type DbTrip = {
   days: number;
   approximate_cost: number;
   currency: string;
-  rating: number;
-  cover_image: string;
   notes: string | null;
   created_at: string;
+};
+
+export type DbTripWithAuthor = DbTrip & {
+  author_name?: string | null;
+  avatar_color?: string | null;
 };
 
 export type DbPlace = {
@@ -30,6 +33,11 @@ export type DbComment = {
   author_id: string;
   message: string;
   created_at: string;
+};
+
+export type DbCommentWithAuthor = DbComment & {
+  author_name?: string | null;
+  avatar_color?: string | null;
 };
 
 export type DbTripLike = {
@@ -55,4 +63,4 @@ export const USER_PUBLIC_SELECT_COLUMNS =
   "id, name, email, avatar_color, home_city";
 
 export const TRIP_SELECT_COLUMNS =
-  "id, user_id, title, city, country, start_date, end_date, days, approximate_cost, currency, rating, cover_image, notes, created_at";
+  "id, user_id, title, city, country, start_date, end_date, days, approximate_cost, currency, notes, created_at";
