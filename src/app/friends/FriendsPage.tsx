@@ -1,9 +1,16 @@
 import { getFriendsSummary } from "@/src/db/trips";
 import { Friends } from "@/src/components/friends/Friends";
-import { appConfig } from "@/src/config/app.config";
+import { getCurrentUserId } from "@/src/auth/session";
+import { GuestAccessState } from "@/src/components/auth/GuestAccessState";
 
 export async function FriendsPage() {
-  const friends = await getFriendsSummary(appConfig.defaultUserId);
+  const currentUserId = await getCurrentUserId();
+
+  if (!currentUserId) {
+    return <GuestAccessState />;
+  }
+
+  const friends = await getFriendsSummary(currentUserId);
 
   return <Friends friends={friends} />;
 }

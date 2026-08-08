@@ -6,7 +6,7 @@ import { getFriendProfileData } from "@/src/db/trips";
 import Link from "next/link";
 import { Text } from "@radix-ui/themes";
 import notFound from "../../not-found";
-import { Divider } from "@/src/components/Divider";
+import { Divider } from "@/src/components/common/Divider";
 import { getStats } from "@/src/utils/getStats";
 
 export default async function FriendProfilePage({
