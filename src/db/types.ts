@@ -49,15 +49,20 @@ export type DbUser = {
   id: string;
   name: string;
   email: string;
-  password: string;
   avatar_color: string;
   home_city: string;
+};
+
+export type DbUserWithPasswordHash = DbUser & {
+  passwordHash: string;
+  updated_at: string;
+  last_login_at: string | null;
 };
 
 export const BCRYPT_ROUNDS = Number(process.env.BCRYPT_ROUNDS ?? "12");
 
 export const USER_SELECT_COLUMNS =
-  "id, name, email, password, avatar_color, home_city";
+  'id, name, email, password_hash AS "passwordHash", avatar_color, home_city, updated_at, last_login_at';
 
 export const USER_PUBLIC_SELECT_COLUMNS =
   "id, name, email, avatar_color, home_city";

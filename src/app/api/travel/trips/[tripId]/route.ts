@@ -1,8 +1,8 @@
 export const runtime = "nodejs";
 import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
-import { appConfig } from "@/src/config/app.config";
 import { deleteTrip, getTripById, updateTrip } from "@/src/db/trips";
+import { getCurrentUserId } from "@/src/auth/session";
 import {
   calculateTripDays,
   normalizeNotes,
@@ -38,6 +38,11 @@ export async function PATCH(
   { params }: { params: Promise<{ tripId: string }> },
 ) {
   try {
+    const currentUserId = await getCurrentUserId();
+    if (!currentUserId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const { tripId } = await params;
 
     const existingTrip = await getTripById(tripId);
@@ -45,7 +50,7 @@ export async function PATCH(
       return NextResponse.json({ error: "Trip not found" }, { status: 404 });
     }
 
-    if (existingTrip.userId !== appConfig.defaultUserId) {
+    if (existingTrip.userId !== currentUserId) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
@@ -110,6 +115,11 @@ export async function DELETE(
   { params }: { params: Promise<{ tripId: string }> },
 ) {
   try {
+    const currentUserId = await getCurrentUserId();
+    if (!currentUserId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const { tripId } = await params;
 
     const existingTrip = await getTripById(tripId);
@@ -117,7 +127,7 @@ export async function DELETE(
       return NextResponse.json({ error: "Trip not found" }, { status: 404 });
     }
 
-    if (existingTrip.userId !== appConfig.defaultUserId) {
+    if (existingTrip.userId !== currentUserId) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 

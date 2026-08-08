@@ -1,4 +1,4 @@
-import { TripsIcon } from "./common/icons/TripsIcon";
+import { TripsIcon } from "./icons/TripsIcon";
 import { ReactNode } from "react";
 
 interface IProp {

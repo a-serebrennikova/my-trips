@@ -9,7 +9,6 @@ import Link from "next/link";
 import { LikeButton } from "../common/LikeButton/LikeButton";
 import { LocationIcon, ClockIcon, CalendarIcon } from "../main/icons";
 import { formatDate } from "@/src/utils/dateFormat";
-import { appConfig } from "@/src/config/app.config";
 import { Card } from "../common/Card";
 import { getNameLetter } from "@/src/utils/getNameLetter";
 import { useRouter } from "next/navigation";
@@ -20,17 +19,17 @@ import { deleteTrip } from "@/src/service/tripService";
 import { ConfirmDialog } from "../common/ConfirmDialog";
 import { IconActionButton } from "../common/IconActionButton";
 import { Trash } from "../common/icons/Trash";
+import { useAuthStore } from "@/src/store/authStore";
 
 export const TripHeader = ({
   trip,
   tripId,
-  showCreateTripButton = false,
 }: {
   trip: Trip;
   tripId: string;
-  showCreateTripButton?: boolean;
 }) => {
   const router = useRouter();
+  const { session } = useAuthStore();
   const [isEditTripModalOpen, setIsEditTripModalOpen] = useState(false);
   const [isDeleteTripModalOpen, setIsDeleteTripModalOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -48,7 +47,8 @@ export const TripHeader = ({
     likedByUserIds,
   } = trip;
 
-  const isOwnTrip = author.id === appConfig.defaultUserId;
+  const currentUserId = session?.user?.id ?? null;
+  const isOwnTrip = currentUserId != null && author.id === currentUserId;
 
   const tripDateRange = `${formatDate(startDate)} — ${formatDate(endDate)}`;
 
@@ -76,8 +76,8 @@ export const TripHeader = ({
           <span aria-hidden>←</span>
           <span>Back to trips</span>
         </Link>
-        <Flex gap={'4'}>
-          {showCreateTripButton && (
+        <Flex gap={"4"}>
+          {isOwnTrip && (
             <IconActionButton
               ariaLabel="Edit trip"
               onClick={() => setIsEditTripModalOpen(true)}
@@ -103,10 +103,15 @@ export const TripHeader = ({
             <h1 className="page-title">{title}</h1>
             <LikeButton
               tripId={tripId}
-              currentUserId={appConfig.defaultUserId}
+              currentUserId={currentUserId}
               initialLikedByUserIds={likedByUserIds}
             />
           </div>
+          {!currentUserId && (
+            <p className="text-sm text-slate-500">
+              Sign in to like this trip and join the discussion.
+            </p>
+          )}
           <div className="flex flex-wrap gap-3">
             <Badge size="3" color={tagsColor.city}>
               <p className="inline-flex items-center gap-2">

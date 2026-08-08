@@ -7,7 +7,7 @@ import { toggleTripLike } from "@/src/service/tripService";
 
 interface LikeButtonProps {
   tripId: string;
-  currentUserId: string;
+  currentUserId: string | null;
   initialLikedByUserIds: string[];
 }
 
@@ -16,7 +16,8 @@ export function LikeButton({
   currentUserId,
   initialLikedByUserIds,
 }: LikeButtonProps) {
-  const initialLiked = initialLikedByUserIds.includes(currentUserId);
+  const initialLiked =
+    currentUserId != null && initialLikedByUserIds.includes(currentUserId);
   const initialLikesCount = initialLikedByUserIds.length;
 
   const sendLikeRequest = useCallback(
@@ -44,7 +45,8 @@ export function LikeButton({
         variant="ghost"
         size="2"
         color="gray"
-        onClick={toggleLike}
+        onClick={currentUserId ? toggleLike : undefined}
+        disabled={!currentUserId}
         aria-pressed={liked}
         aria-label={liked ? "Remove like" : "Like this trip"}
       >

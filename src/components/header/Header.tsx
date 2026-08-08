@@ -1,17 +1,44 @@
 "use client";
 
-import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { IconButton } from "@radix-ui/themes";
+import { ProfileDropdown } from "./ProfileDropdown";
+import { ProfileScreenMenu } from "./ProfileScreenMenu";
 import { appConfig } from "../../config/app.config";
 import { Logo } from "./Logo";
-import { MenuDropdown } from "./MenuDropdown";
+import { NavigationScreenMenu } from "./NavigationScreenMenu";
 import { NavLink } from "./NavLink";
-import { ProfileIcon } from "./icons";
+import { LoginForm } from "../authForms/LoginForm";
+import { RegisterForm } from "../authForms/RegisterForm";
+import { useAuthStore } from "@/src/store/authStore";
+import { useState } from "react";
+import { Button } from "@radix-ui/themes";
+import { signOutUser } from "@/src/auth/signOut";
+
+type AuthDialogView = "login" | "register" | null;
 
 export function Header() {
   const pathname = usePathname();
   const isProfileActive = pathname === "/me";
+  const [activeDialog, setActiveDialog] = useState<AuthDialogView>(null);
+  const { isAuthenticated, setAuthState } = useAuthStore();
+
+  const openLoginDialog = () => setActiveDialog("login");
+  const openRegisterDialog = () => setActiveDialog("register");
+  const handleLoginDialogChange = (open: boolean) => {
+    setActiveDialog(open ? "login" : null);
+  };
+  const handleRegisterDialogChange = (open: boolean) => {
+    setActiveDialog(open ? "register" : null);
+  };
+
+  const handleSignOut = async () => {
+    try {
+      await signOutUser();
+      setAuthState("unauthenticated", null);
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
+  };
 
   return (
     <header className="border-b border-teal-200 bg-teal-700 text-teal-50">
@@ -19,7 +46,7 @@ export function Header() {
         <Logo />
 
         <div className="flex justify-center">
-          <nav className="hidden h-9 items-center gap-1 rounded-2xl bg-teal-600 p-1.5 shadow-sm md:flex">
+          <nav className="max-lg:hidden lg:flex h-9 items-center gap-1 rounded-2xl bg-teal-600 p-1.5 shadow-sm">
             {appConfig.routes.map((route) => (
               <NavLink key={route.href} href={route.href} label={route.label} />
             ))}
@@ -27,21 +54,40 @@ export function Header() {
         </div>
 
         <div className="flex items-center justify-end gap-2">
-          {/* TODO: перенос вниз */}
-          <MenuDropdown />
-          <IconButton
-            asChild
-            variant={isProfileActive ? "surface" : "classic"}
-            size="2"
-            radius="full"
-            aria-label="Open profile"
-          >
-            <Link href="/me">
-              <ProfileIcon />
-            </Link>
-          </IconButton>
+          <div className="lg:hidden">
+            <NavigationScreenMenu />
+          </div>
+          {isAuthenticated ? (
+            <>
+              <div className="lg:hidden">
+                <ProfileScreenMenu
+                  onSignOut={handleSignOut}
+                  isProfileActive={isProfileActive}
+                />
+              </div>
+              <div className="hidden lg:block">
+                <ProfileDropdown
+                  onSignOut={handleSignOut}
+                  isProfileActive={isProfileActive}
+                />
+              </div>
+            </>
+          ) : (
+            <Button onClick={openLoginDialog}>Sign in</Button>
+          )}
         </div>
       </div>
+
+      <LoginForm
+        open={activeDialog === "login"}
+        onOpenChange={handleLoginDialogChange}
+        onOpenRegister={openRegisterDialog}
+      />
+      <RegisterForm
+        open={activeDialog === "register"}
+        onOpenChange={handleRegisterDialogChange}
+        onOpenLogin={openLoginDialog}
+      />
     </header>
   );
 }

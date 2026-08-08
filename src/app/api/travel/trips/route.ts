@@ -1,8 +1,8 @@
 export const runtime = "nodejs";
 import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
-import { appConfig } from "@/src/config/app.config";
 import { createTrip, getAllTravelData } from "@/src/db/trips";
+import { getCurrentUserId } from "@/src/auth/session";
 import {
   calculateTripDays,
   normalizeNotes,
@@ -32,6 +32,11 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
+    const currentUserId = await getCurrentUserId();
+    if (!currentUserId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const body = await request.json();
     const result = tripFormSchema.safeParse(body);
 
@@ -53,7 +58,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const trip = await createTrip(appConfig.defaultUserId, {
+    const trip = await createTrip(currentUserId, {
       title: result.data.title,
       city: result.data.city,
       country: result.data.country,

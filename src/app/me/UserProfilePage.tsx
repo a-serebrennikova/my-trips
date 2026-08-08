@@ -4,15 +4,20 @@ import type { UserProfileStat } from "@/src/components/common/UserProfileHeader"
 import { UserProfileHeader } from "@/src/components/common/UserProfileHeader";
 import { getFriendProfileData } from "@/src/db/trips";
 import { Text } from "@radix-ui/themes";
-import { Divider } from "@/src/components/Divider";
+import { Divider } from "@/src/components/common/Divider";
 import { notFound } from "next/navigation";
-import { appConfig } from "@/src/config/app.config";
 import { getStats } from "@/src/utils/getStats";
 import { CreateTripDividerAction } from "@/src/components/common/CreateTripDividerAction";
+import { getCurrentUserId } from "@/src/auth/session";
+import { GuestAccessState } from "@/src/components/auth/GuestAccessState";
 
 export const UserProfilePage = async () => {
-  // TODO переделать
-  const profileData = await getFriendProfileData(appConfig.defaultUserId);
+  const currentUserId = await getCurrentUserId();
+  if (!currentUserId) {
+    return <GuestAccessState />;
+  }
+
+  const profileData = await getFriendProfileData(currentUserId);
 
   if (!profileData) {
     notFound();

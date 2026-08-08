@@ -41,42 +41,37 @@ body {
   line-height: 1.4;
 }
 
-.text-small {
-  font-size: 0.875rem;
-  line-height: 1.4;
-  font-weight: 500;
+@utility text-base-ui {
+  @apply text-slate-900;
+  font-family: var(--font-space-grotesk), "Avenir Next", sans-serif;
 }
 
 .page-title {
-  @apply text-slate-900;
+  @apply text-base-ui;
   font-size: clamp(1.5rem, 4vw, 2rem);
   line-height: 1.1;
   font-weight: 700;
-  font-family: var(--font-space-grotesk), "Avenir Next", sans-serif;
 }
 
 .text-standard {
-  @apply text-slate-900;
+  @apply text-base-ui;
   font-size: 1rem;
   line-height: 1.5;
   font-weight: 500;
-  font-family: var(--font-space-grotesk), "Avenir Next", sans-serif;
 }
 
 .text-small {
-  @apply text-slate-900;
+  @apply text-base-ui;
   font-size: 0.875rem;
   line-height: 1.4;
   font-weight: 500;
-  font-family: var(--font-space-grotesk), "Avenir Next", sans-serif;
 }
 
 .card-title {
-  @apply text-(--orange-a11);
+  @apply text-base-ui text-(--orange-a11);
   font-size: 1rem;
   line-height: 1.5;
   font-weight: 500;
-  font-family: var(--font-space-grotesk), "Avenir Next", sans-serif;
 }
 
 .btn-primary-pill {
@@ -95,4 +90,16 @@ body {
   @apply text-teal-50 hover:bg-teal-50 hover:text-teal-700;
   font-size: 0.875rem;
   line-height: 1.4;
+}
+
+.mobile-menu-item {
+  @apply flex items-center gap-3 rounded-2xl px-4 py-4 transition-colors;
+}
+
+.mobile-menu-item-active {
+  @apply bg-teal-50/15 text-white;
+}
+
+.mobile-menu-item-inactive {
+  @apply text-teal-50/90 hover:bg-teal-50/10 hover:text-white;
 }
