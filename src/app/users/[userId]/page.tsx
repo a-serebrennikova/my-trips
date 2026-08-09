@@ -9,7 +9,7 @@ import notFound from "../../not-found";
 import { Divider } from "@/src/components/common/Divider";
 import { getStats } from "@/src/utils/getStats";
 
-export default async function FriendProfilePage({
+export default async function UserProfilePage({
   params,
 }: {
   params: Promise<{ userId: string }>;
@@ -29,22 +29,24 @@ export default async function FriendProfilePage({
     <>
       <Card className="flex flex-col gap-4">
         <Link
-          href="/friends"
+          href="/users"
           className="inline-flex items-center gap-2 text-standard font-medium text-sky-700 transition hover:text-sky-500"
         >
           <span aria-hidden>←</span>
-          Back to friends
+          Back to users
         </Link>
         <UserProfileHeader user={user} stats={stats} />
       </Card>
 
-      <section>
+      <section className="flex flex-col flex-1">
         <Divider title={"Trips"} />
 
         {userTrips.length === 0 ? (
-          <Text as="p" className="text-standard text-slate-500">
-            This friend does not have any saved trips yet.
-          </Text>
+          <Card className="flex-1 items-center justify-center">
+            <Text as="p" className="text-standard">
+              This user does not have any saved trips yet.
+            </Text>
+          </Card>
         ) : (
           <div className="flex flex-wrap gap-4">
             {userTrips.map((trip) => (

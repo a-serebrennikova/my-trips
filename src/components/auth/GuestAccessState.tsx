@@ -11,7 +11,7 @@ export function GuestAccessState({
   return (
     <Card className="flex flex-1 flex-col items-center justify-center gap-4 p-8 text-center">
       <h1 className="page-title">{title}</h1>
-      <p className="text-standard">{description}</p>
+      <p className="text-standard text-center">{description}</p>
       <Link
         href="/"
         className="inline-flex items-center justify-center rounded-full bg-teal-600 px-5 py-2.5 font-semibold text-white transition hover:bg-teal-500"

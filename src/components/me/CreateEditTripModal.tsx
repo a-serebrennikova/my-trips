@@ -15,6 +15,10 @@ import { CURRENCY } from "@/src/types";
 import { type TripFormValues, tripFormSchema } from "@/src/schemas/tripForm";
 import { upsertTrip } from "@/src/service/tripService";
 import { Dialog } from "@radix-ui/themes";
+import {
+  notifyError,
+  notifySuccess,
+} from "@/src/components/common/Notification/notificationBus";
 
 type CreateEditTripModalProps = {
   open: boolean;
@@ -51,7 +55,6 @@ export const CreateEditTripModal = ({
     handleSubmit,
     control,
     formState: { errors, isSubmitting, isDirty },
-    reset,
   } = useForm<TripFormValues>({
     resolver: zodResolver(tripFormSchema),
     defaultValues: { ...defaultValues, ...initialValues },
@@ -71,11 +74,18 @@ export const CreateEditTripModal = ({
     try {
       await upsertTrip(mode === "edit" ? tripId : undefined, payload);
 
+      if (mode === "create") {
+        notifySuccess("Trip created successfully");
+      }
+
+      if (mode === "edit") {
+        notifySuccess("Trip updated successfully");
+      }
+
       onOpenChange(false);
       router.refresh();
-      reset(defaultValues);
     } catch {
-      // Intentionally no UI handling for request failures at this stage.
+      notifyError("Failed to create trip");
     }
   };
 

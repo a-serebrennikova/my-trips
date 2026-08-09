@@ -10,7 +10,7 @@ export const HomeIcon = () => (
   </svg>
 );
 
-export const FriendsIcon = () => (
+export const UsersIcon = () => (
   <svg viewBox="0 0 24 24" fill="none" className="h-4 w-4 shrink-0">
     <path
       d="M8 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm8 0a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z"
@@ -55,5 +55,5 @@ export const BurgerIcon = () => (
 export const NAV_ICONS: Record<string, () => ReactElement> = {
   "/": HomeIcon,
   "/trips": TripsIcon,
-  "/friends": FriendsIcon,
+  "/users": UsersIcon,
 };

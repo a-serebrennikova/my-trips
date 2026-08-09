@@ -12,8 +12,8 @@ export const appConfig = {
       label: "Trips",
     },
     {
-      href: "/friends",
-      label: "Friends",
+      href: "/users",
+      label: "Users",
     },
   ],
 };

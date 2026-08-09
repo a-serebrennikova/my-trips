@@ -19,7 +19,7 @@ import { deleteTrip } from "@/src/service/tripService";
 import { ConfirmDialog } from "../common/ConfirmDialog";
 import { IconActionButton } from "../common/IconActionButton";
 import { Trash } from "../common/icons/Trash";
-import { useAuthStore } from "@/src/store/authStore";
+import { useSession } from "next-auth/react";
 
 export const TripHeader = ({
   trip,
@@ -29,7 +29,7 @@ export const TripHeader = ({
   tripId: string;
 }) => {
   const router = useRouter();
-  const { session } = useAuthStore();
+  const { data: session } = useSession();
   const [isEditTripModalOpen, setIsEditTripModalOpen] = useState(false);
   const [isDeleteTripModalOpen, setIsDeleteTripModalOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
