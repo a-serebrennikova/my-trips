@@ -9,10 +9,10 @@ import { NavigationScreenMenu } from "./NavigationScreenMenu";
 import { NavLink } from "./NavLink";
 import { LoginForm } from "../authForms/LoginForm";
 import { RegisterForm } from "../authForms/RegisterForm";
-import { useAuthStore } from "@/src/store/authStore";
 import { useState } from "react";
 import { Button } from "@radix-ui/themes";
 import { signOutUser } from "@/src/auth/signOut";
+import { useSession } from "next-auth/react";
 
 type AuthDialogView = "login" | "register" | null;
 
@@ -20,7 +20,8 @@ export function Header() {
   const pathname = usePathname();
   const isProfileActive = pathname === "/me";
   const [activeDialog, setActiveDialog] = useState<AuthDialogView>(null);
-  const { isAuthenticated, setAuthState } = useAuthStore();
+  const { status } = useSession();
+  const isAuthenticated = status === "authenticated";
 
   const openLoginDialog = () => setActiveDialog("login");
   const openRegisterDialog = () => setActiveDialog("register");
@@ -34,7 +35,6 @@ export function Header() {
   const handleSignOut = async () => {
     try {
       await signOutUser();
-      setAuthState("unauthenticated", null);
     } catch (error) {
       console.error("Error signing out:", error);
     }

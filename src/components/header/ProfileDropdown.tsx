@@ -13,7 +13,7 @@ export const ProfileDropdown = ({ isProfileActive, onSignOut }: IProps) => {
     <DropdownMenu.Root>
       <DropdownMenu.Trigger asChild>
         <IconButton
-          variant={isProfileActive ? "surface" : "classic"}
+          variant={isProfileActive ? "surface" : "solid"}
           size="2"
           radius="full"
           className="max-lg:hidden lg:inline-flex"
@@ -26,7 +26,7 @@ export const ProfileDropdown = ({ isProfileActive, onSignOut }: IProps) => {
       <DropdownMenu.Portal>
         <DropdownMenu.Content
           sideOffset={10}
-          className="min-w-100 rounded-3xl border border-teal-200 bg-teal-600 p-3 shadow-xl"
+          className="min-w-100 flex flex-col gap-1 rounded-3xl border border-teal-200 bg-teal-600 p-3 shadow-xl"
         >
           <DropdownMenu.Item asChild>
             <Link

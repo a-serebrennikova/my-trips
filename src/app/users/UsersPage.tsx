@@ -1,9 +1,9 @@
 import { getFriendsSummary } from "@/src/db/trips";
-import { Friends } from "@/src/components/friends/Friends";
+import { UsersList } from "@/src/components/users/UsersList";
 import { getCurrentUserId } from "@/src/auth/session";
 import { GuestAccessState } from "@/src/components/auth/GuestAccessState";
 
-export async function FriendsPage() {
+export async function UsersPage() {
   const currentUserId = await getCurrentUserId();
 
   if (!currentUserId) {
@@ -12,5 +12,5 @@ export async function FriendsPage() {
 
   const friends = await getFriendsSummary(currentUserId);
 
-  return <Friends friends={friends} />;
+  return <UsersList friends={friends} />;
 }

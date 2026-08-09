@@ -93,7 +93,7 @@ body {
 }
 
 .mobile-menu-item {
-  @apply flex items-center gap-3 rounded-2xl px-4 py-4 transition-colors;
+  @apply flex flex-row items-center justify-start gap-3 rounded-2xl px-4 py-4 text-sm font-medium leading-none no-underline transition-colors;
 }
 
 .mobile-menu-item-active {
@@ -102,4 +102,85 @@ body {
 
 .mobile-menu-item-inactive {
   @apply text-teal-50/90 hover:bg-teal-50/10 hover:text-white;
+}
+
+.notification-center {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: min(360px, calc(100vw - 32px));
+}
+
+.notification {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  border-radius: 14px;
+  border: 1px solid transparent;
+  box-shadow: 0 8px 24px rgba(6, 24, 44, 0.12);
+  padding: 12px 14px;
+  font-size: 0.9rem;
+  line-height: 1.35;
+  opacity: 0;
+  transform: translateY(-10px) translateX(12px) scale(0.98);
+  transition:
+    opacity 220ms ease,
+    transform 240ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  will-change: opacity, transform;
+  animation: notification-slide-in 180ms ease-out;
+}
+
+@keyframes notification-slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.notification-enter {
+  opacity: 1;
+  transform: translateY(0) translateX(0) scale(1);
+}
+
+.notification-info {
+  background: #ecfeff;
+  color: #0f4c5c;
+  border-color: #b4e4ea;
+}
+
+.notification-success {
+  background: #ecfdf3;
+  color: #14532d;
+  border-color: #b8f0c9;
+}
+
+.notification-error {
+  background: #fef2f2;
+  color: #7f1d1d;
+  border-color: #fecaca;
+}
+
+.close-btn {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1;
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+}
+
+.close-btn:hover {
+  opacity: 1;
 }

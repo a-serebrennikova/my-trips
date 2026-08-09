@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Button, Dialog, Text, TextField } from "@radix-ui/themes";
+import { Button, Dialog, Flex, Text, TextField } from "@radix-ui/themes";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import {
@@ -9,6 +9,7 @@ import {
   registerFormSchema,
 } from "@/src/schemas/authForms";
 import { registerUser } from "@/src/auth/registerUser";
+import { notifyError } from "../common/Notification/notificationBus";
 
 type RegisterFormProps = {
   open: boolean;
@@ -55,25 +56,29 @@ export function RegisterForm({
   const onSubmit = async (data: RegisterFormValues) => {
     setServerError(null);
 
-    const result = await registerUser({
-      email: data.email,
-      password: data.password,
-      name: data.name,
-      homeCity: data.homeCity,
-    });
+    try {
+      const result = await registerUser({
+        email: data.email,
+        password: data.password,
+        name: data.name,
+        homeCity: data.homeCity,
+      });
 
-    if (!result.ok) {
-      if (result.error === "EMAIL_TAKEN") {
-        setServerError("This email is already in use");
-      } else {
-        setServerError("Registration failed. Please try again");
+      if (!result.ok) {
+        if (result.error === "EMAIL_TAKEN") {
+          setServerError("This email is already in use");
+        } else {
+          setServerError("Registration failed. Please try again");
+        }
+
+        return;
       }
 
-      return;
+      reset(defaultValues);
+      onOpenChange(false);
+    } catch {
+      notifyError("Error registering user");
     }
-
-    reset(defaultValues);
-    onOpenChange(false);
   };
 
   const handleLoginClick = () => {
@@ -197,25 +202,27 @@ export function RegisterForm({
             </Text>
           )}
 
-          <Button
-            type="submit"
-            size="3"
-            className="w-full"
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? "Submitting..." : "Register"}
-          </Button>
-
-          <Text as="p" size="2" className="text-center text-slate-600">
-            Already have an account?{" "}
-            <button
-              type="button"
-              onClick={handleLoginClick}
-              className="font-semibold text-teal-700 transition hover:text-teal-600"
+          <Flex direction="column" gap="2" mt="3">
+            <Button
+              type="submit"
+              size="3"
+              className="w-full"
+              disabled={isSubmitting}
             >
-              Login
-            </button>
-          </Text>
+              {isSubmitting ? "Submitting..." : "Register"}
+            </Button>
+
+            <Text as="p" size="2" className="text-center text-slate-600">
+              Already have an account?{" "}
+              <button
+                type="button"
+                onClick={handleLoginClick}
+                className="font-semibold text-teal-700 transition hover:text-teal-600"
+              >
+                Login
+              </button>
+            </Text>
+          </Flex>
         </form>
       </Dialog.Content>
     </Dialog.Root>

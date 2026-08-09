@@ -7,6 +7,7 @@ import { Theme } from "@radix-ui/themes";
 import { Manrope, Space_Grotesk } from "next/font/google";
 import { SessionProvider } from "next-auth/react";
 import { auth } from "../auth";
+import { NotificationCenter } from "../components/common/Notification/NotificationCenter";
 
 const manrope = Manrope({
   subsets: ["latin"],
@@ -52,6 +53,7 @@ export default async function RootLayout({
                 <div className="flex flex-col flex-1 space-y-5">{children}</div>
               </div>
             </main>
+            <NotificationCenter />
           </Theme>
         </SessionProvider>
       </body>

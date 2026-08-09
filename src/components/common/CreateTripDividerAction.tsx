@@ -13,15 +13,19 @@ export const CreateTripDividerAction = () => {
       <IconActionButton
         className="shrink-0"
         ariaLabel="Create trip"
+        variant="soft"
+        color="grass"
         onClick={() => setIsCreateTripModalOpen(true)}
       >
         <Plus />
       </IconActionButton>
 
-      <CreateEditTripModal
-        open={isCreateTripModalOpen}
-        onOpenChange={setIsCreateTripModalOpen}
-      />
+      {isCreateTripModalOpen && (
+        <CreateEditTripModal
+          open={isCreateTripModalOpen}
+          onOpenChange={setIsCreateTripModalOpen}
+        />
+      )}
     </>
   );
 };

@@ -1,14 +1,14 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Button, Dialog, Text, TextField } from "@radix-ui/themes";
+import { Button, Dialog, Flex, Text, TextField } from "@radix-ui/themes";
 import { useRouter } from "next/navigation";
 import { getSession } from "next-auth/react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { type LoginFormValues, loginFormSchema } from "@/src/schemas/authForms";
-import { useAuthStore } from "@/src/store/authStore";
 import { signInUser } from "@/src/auth/signIn";
+import { notifyError } from "../common/Notification/notificationBus";
 
 type LoginFormProps = {
   open: boolean;
@@ -29,7 +29,6 @@ export function LoginForm({
   onOpenRegister,
 }: LoginFormProps) {
   const router = useRouter();
-  const { setAuthState } = useAuthStore();
   const [serverError, setServerError] = useState<string | null>(null);
 
   const {
@@ -54,19 +53,24 @@ export function LoginForm({
   const onSubmit = async (values: LoginFormValues) => {
     setServerError(null);
 
-    const result = await signInUser(values.email, values.password);
+    try {
+      const result = await signInUser(values.email, values.password);
 
-    if (!result || result.error) {
-      setServerError("Incorrect email or password");
-      return;
+      if (!result || result.error) {
+        setServerError("Incorrect email or password");
+        return;
+      }
+
+      await getSession();
+
+      reset(defaultValues);
+      onOpenChange(false);
+      
+      router.push("/me");
+      router.refresh();
+    } catch {
+      notifyError("Error during login");
     }
-
-    const session = await getSession();
-    setAuthState(session ? "authenticated" : "unauthenticated", session);
-    reset(defaultValues);
-    onOpenChange(false);
-    router.push("/me");
-    router.refresh();
   };
 
   const handleRegisterClick = () => {
@@ -136,25 +140,27 @@ export function LoginForm({
             </Text>
           )}
 
-          <Button
-            type="submit"
-            size="3"
-            className="w-full"
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? "Logging in..." : "Login"}
-          </Button>
-
-          <Text as="p" size="2" className="text-center text-slate-600">
-            Don&apos;t have an account?{" "}
-            <button
-              type="button"
-              onClick={handleRegisterClick}
-              className="font-semibold text-teal-700 transition hover:text-teal-600"
+          <Flex direction="column" gap="2" mt="3">
+            <Button
+              type="submit"
+              size="3"
+              className="w-full"
+              disabled={isSubmitting}
             >
-              Register
-            </button>
-          </Text>
+              {isSubmitting ? "Logging in..." : "Login"}
+            </Button>
+
+            <Text as="p" size="2" className="text-center mt-4">
+              Don&apos;t have an account?&nbsp;
+              <button
+                type="button"
+                onClick={handleRegisterClick}
+                className="font-semibold text-teal-700 transition hover:text-teal-600"
+              >
+                Register
+              </button>
+            </Text>
+          </Flex>
         </form>
       </Dialog.Content>
     </Dialog.Root>

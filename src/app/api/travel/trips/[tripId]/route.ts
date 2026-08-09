@@ -138,8 +138,8 @@ export async function DELETE(
 
     revalidatePath("/");
     revalidatePath("/trips");
-    revalidatePath("/friends");
-    revalidatePath(`/friends/${existingTrip.userId}`);
+    revalidatePath("/users");
+    revalidatePath(`/users/${existingTrip.userId}`);
     revalidatePath("/me");
 
     return NextResponse.json({ deleted: true });
