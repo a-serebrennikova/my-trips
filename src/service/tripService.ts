@@ -11,6 +11,32 @@ export async function toggleTripLike(tripId: string, signal?: AbortSignal) {
 	);
 }
 
+export async function createTripComment(tripId: string, content: string, signal?: AbortSignal) {
+	return requestJson<{ comments: { id: string; content: string; }[] }>(
+		`/api/travel/trips/${tripId}/comment`,
+		{
+			method: "POST",
+			signal,
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({ content }),
+			errorMessage: "Failed to create comment",
+		},
+	);
+}
+
+export async function deleteTripComment(tripId: string, commentId: string, signal?: AbortSignal) {
+	return requestVoid(
+		`/api/travel/trips/${tripId}/comment/${commentId}`,
+		{
+			method: "DELETE",
+			signal,
+			errorMessage: "Failed to delete comment",
+		},
+	);
+}
+
 export async function upsertTrip(
 	tripId: string | undefined,
 	payload: unknown,

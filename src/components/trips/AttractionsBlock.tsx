@@ -8,7 +8,7 @@ interface IProps {
 
 export const AttractionsBlock = ({ attractions }: IProps) => {
   return (
-    <Card>
+    <Card className="flex-1">
       <div className="flex flex-col gap-2">
         <p className="card-title">Attractions:</p>
         <div className="flex flex-wrap gap-3">

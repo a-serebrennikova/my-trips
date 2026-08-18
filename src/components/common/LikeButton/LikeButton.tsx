@@ -39,22 +39,32 @@ export function LikeButton({
         ? initialLikesCount + 1
         : Math.max(0, initialLikesCount - 1);
 
+  const renderLikeIcon = () => {
+    return (
+      <div className="flex items-center gap-1">
+        <Like isLiked={liked} />
+        {likesCount}
+      </div>
+    );
+  };
+
   return (
     <div className="flex items-center gap-2">
-      <IconButton
-        variant="ghost"
-        size="2"
-        color="gray"
-        onClick={currentUserId ? toggleLike : undefined}
-        disabled={!currentUserId}
-        aria-pressed={liked}
-        aria-label={liked ? "Remove like" : "Like this trip"}
-      >
-        <div className="flex items-center gap-1">
-          <Like isLiked={liked} />
-          {likesCount}
-        </div>
-      </IconButton>
+      {currentUserId ? (
+        <IconButton
+          variant="ghost"
+          size="2"
+          color="gray"
+          onClick={currentUserId ? toggleLike : undefined}
+          disabled={!currentUserId}
+          aria-pressed={liked}
+          aria-label={liked ? "Remove like" : "Like this trip"}
+        >
+          {renderLikeIcon()}
+        </IconButton>
+      ) : (
+        renderLikeIcon()
+      )}
     </div>
   );
 }

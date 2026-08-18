@@ -3,7 +3,7 @@ import { Card } from "../common/Card";
 
 export const NotesBlock = ({ notes }: { notes: Required<Trip["notes"]> }) => {
   return (
-    <Card>
+    <Card className="flex-1">
       {notes && (
         <>
           <p className="card-title">Notes:</p>
