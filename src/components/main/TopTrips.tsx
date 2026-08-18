@@ -9,7 +9,7 @@ const EmptyTripsState = () => (
 );
 
 export const TopTrips = async () => {
-  const { users, trips } = await getAllTravelData(3, 0);
+  const { users, trips } = await getAllTravelData(4, 0);
 
   if (trips.length === 0) {
     return <EmptyTripsState />;

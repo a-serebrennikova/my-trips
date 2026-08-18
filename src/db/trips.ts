@@ -416,7 +416,6 @@ export async function createComment(
     [commentId, tripId, authorId, normalizedMessage, createdAt],
   );
 
-  // Fetch author info
   const userResult = await query<DbUser>(
     `SELECT id, name, avatar_color FROM users WHERE id = $1 LIMIT 1`,
     [authorId],
@@ -436,6 +435,23 @@ export async function createComment(
     message: normalizedMessage,
     createdAt,
   };
+}
+
+export async function deleteComment(
+  tripId: string,
+  commentId: string,
+  userId: string,
+): Promise<boolean> {
+  const result = await query<{ id: string }>(
+    `DELETE FROM comments
+     WHERE id = $1
+       AND trip_id = $2
+       AND author_id = $3
+     RETURNING id`,
+    [commentId, tripId, userId],
+  );
+
+  return (result.rowCount ?? 0) > 0;
 }
 
 export async function toggleTripLike(
