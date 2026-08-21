@@ -13,6 +13,7 @@ import { GuestAccessState } from "@/src/components/auth/GuestAccessState";
 
 export const UserProfilePage = async () => {
   const currentUserId = await getCurrentUserId();
+
   if (!currentUserId) {
     return <GuestAccessState />;
   }
@@ -30,7 +31,7 @@ export const UserProfilePage = async () => {
   return (
     <>
       <Card className="flex flex-col gap-4">
-        <UserProfileHeader user={user} stats={stats} />
+        <UserProfileHeader user={user} stats={stats} currentUserId={currentUserId} />
       </Card>
 
       <section>

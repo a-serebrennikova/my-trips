@@ -19,6 +19,7 @@ import {
   notifyError,
   notifySuccess,
 } from "@/src/components/common/Notification/notificationBus";
+import { ErrorText } from "../common/ErrorText";
 
 type CreateEditTripModalProps = {
   open: boolean;
@@ -111,9 +112,7 @@ export const CreateEditTripModal = ({
               className={errors.title ? invalidFieldClassName : undefined}
             />
             {errors.title && (
-              <Text as="p" size="1" className="text-red-600">
-                {errors.title.message}
-              </Text>
+              <ErrorText error={errors.title?.message} />
             )}
           </div>
 
@@ -129,9 +128,7 @@ export const CreateEditTripModal = ({
                 className={errors.city ? invalidFieldClassName : undefined}
               />
               {errors.city && (
-                <Text as="p" size="1" className="text-red-600">
-                  {errors.city.message}
-                </Text>
+                <ErrorText error={errors.city?.message} />
               )}
             </div>
 
@@ -146,9 +143,7 @@ export const CreateEditTripModal = ({
                 className={errors.country ? invalidFieldClassName : undefined}
               />
               {errors.country && (
-                <Text as="p" size="1" className="text-red-600">
-                  {errors.country.message}
-                </Text>
+                <ErrorText error={errors.country?.message} />
               )}
             </div>
           </Flex>
@@ -165,9 +160,7 @@ export const CreateEditTripModal = ({
                 className={errors.startDate ? invalidFieldClassName : undefined}
               />
               {errors.startDate && (
-                <Text as="p" size="1" className="text-red-600">
-                  {errors.startDate.message}
-                </Text>
+                <ErrorText error={errors.startDate?.message} />
               )}
             </div>
 
@@ -182,9 +175,7 @@ export const CreateEditTripModal = ({
                 className={errors.endDate ? invalidFieldClassName : undefined}
               />
               {errors.endDate && (
-                <Text as="p" size="1" className="text-red-600">
-                  {errors.endDate.message}
-                </Text>
+                <ErrorText error={errors.endDate?.message} />
               )}
             </div>
           </Flex>
@@ -205,9 +196,7 @@ export const CreateEditTripModal = ({
                 }
               />
               {errors.approximateCost && (
-                <Text as="p" size="1" className="text-red-600">
-                  {errors.approximateCost.message}
-                </Text>
+                <ErrorText error={errors.approximateCost?.message} />
               )}
             </div>
 
@@ -240,9 +229,7 @@ export const CreateEditTripModal = ({
                 )}
               />
               {errors.currency && (
-                <Text as="p" size="1" className="text-red-600">
-                  {errors.currency.message}
-                </Text>
+                <ErrorText error={errors.currency?.message} />
               )}
             </div>
           </Flex>
@@ -259,9 +246,7 @@ export const CreateEditTripModal = ({
               className={errors.notes ? invalidFieldClassName : undefined}
             />
             {errors.notes && (
-              <Text as="p" size="1" className="text-red-600">
-                {errors.notes.message}
-              </Text>
+              <ErrorText error={errors.notes?.message} />
             )}
           </div>
 

@@ -42,7 +42,12 @@ export const CommentsBlock = ({
       {comments.map(({ id, author, message }) => (
         <Flex key={id} gap="2" align="center" className="w-full">
           <Flex key={id} gap="2" align="center" className="w-full">
-            <Avatar fallback={getNameLetter(author.name)} color="grass" />
+            <Avatar
+              src={author.avatarUrl ?? undefined}
+              alt={author.name}
+              fallback={getNameLetter(author.name)}
+              color="grass"
+            />
             <div className="flex flex-col">
               <Text className="text-standard font-semibold">{author.name}</Text>
               <Text className="text-standard">{message}</Text>

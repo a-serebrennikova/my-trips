@@ -16,14 +16,16 @@
   --brand-800: #11635d;
   --orange-a3: #ff9c0029;
   --orange-a11: #cc4e00;
+  --font-sans: "Avenir Next", "Segoe UI", sans-serif;
+  --font-display: "Avenir Next", "Segoe UI", sans-serif;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-text-50: var(--text-color-50);
-  --font-sans: var(--font-space-grotesk), "Avenir Next", sans-serif;
-  --font-display: var(--font-space-grotesk), "Avenir Next", sans-serif;
+  --font-sans: var(--font-sans);
+  --font-display: var(--font-display);
   --font-mono:
     "SFMono-Regular", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New",
     monospace;
@@ -31,7 +33,7 @@
 
 body {
   background: #f1fffd;
-  font-family: var(--font-space-grotesk), "Avenir Next", sans-serif;
+  font-family: var(--font-sans);
   color: var(--foreground);
 }
 

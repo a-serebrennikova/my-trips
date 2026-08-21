@@ -36,12 +36,12 @@ function mapDbCurrencyToCurrency(value: string): Currency {
 function mapDbAuthorInfo(
   id: string,
   name?: string | null,
-  avatarColor?: string | null,
+  avatarUrl?: string | null,
 ) {
   return {
     id,
     name: name || "Unknown",
-    avatarColor: avatarColor || "gray",
+    avatarUrl: avatarUrl ?? null,
   };
 }
 
@@ -83,7 +83,7 @@ export function mapDbCommentsToComments(
       id: c.id,
       tripId: c.trip_id,
       authorId: c.author_id,
-      author: mapDbAuthorInfo(c.author_id, c.author_name, c.avatar_color),
+      author: mapDbAuthorInfo(c.author_id, c.author_name, c.avatar_url),
       message: c.message,
       createdAt: c.created_at,
     }));
@@ -104,7 +104,7 @@ export function mapDbTripToTrip(
   return {
     id: db.id,
     userId: db.user_id,
-    author: mapDbAuthorInfo(db.user_id, db.author_name, db.avatar_color),
+    author: mapDbAuthorInfo(db.user_id, db.author_name, db.avatar_url),
     title: db.title,
     city: db.city,
     country: db.country,
@@ -129,7 +129,7 @@ export function mapDbTripToTripPreview(
   return {
     id: db.id,
     userId: db.user_id,
-    author: mapDbAuthorInfo(db.user_id, db.author_name, db.avatar_color),
+    author: mapDbAuthorInfo(db.user_id, db.author_name, db.avatar_url),
     title: db.title,
     city: db.city,
     country: db.country,
@@ -152,7 +152,7 @@ export function mapDbUserToUser(db: DbUser): User {
     id: db.id,
     name: db.name,
     email: db.email,
-    avatarColor: db.avatar_color,
+    avatarUrl: db.avatar_url ?? null,
     homeCity: db.home_city,
   };
 }

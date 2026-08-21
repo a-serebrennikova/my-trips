@@ -39,7 +39,12 @@ const TripTags = ({
 
 const AuthorInfo = ({ author }: { author: User }) => (
   <div className="flex items-center  gap-2">
-    <Avatar fallback={getNameLetter(author.name)} color="grass" />
+    <Avatar
+      src={author.avatarUrl ?? undefined}
+      alt={author.name}
+      fallback={getNameLetter(author.name)}
+      color="grass"
+    />
     <div>
       <p className="text-standard font-semibold text-slate-900">
         {author.name}

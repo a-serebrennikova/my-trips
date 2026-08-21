@@ -2,14 +2,14 @@ export type User = {
   id: string;
   name: string;
   email: string;
-  avatarColor: string;
+  avatarUrl?: string | null;
   homeCity: string;
 };
 
 export type AuthorInfo = {
   id: string;
   name: string;
-  avatarColor: string;
+  avatarUrl?: string | null;
 };
 
 export type Place = {

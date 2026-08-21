@@ -1,4 +1,4 @@
-# myTrips - Your travel diary
+# myTrips - a travel diary
 
 ## Overview
 

@@ -15,7 +15,7 @@ export type DbTrip = {
 
 export type DbTripWithAuthor = DbTrip & {
   author_name?: string | null;
-  avatar_color?: string | null;
+  avatar_url?: string | null;
 };
 
 export type DbPlace = {
@@ -37,7 +37,7 @@ export type DbComment = {
 
 export type DbCommentWithAuthor = DbComment & {
   author_name?: string | null;
-  avatar_color?: string | null;
+  avatar_url?: string | null;
 };
 
 export type DbTripLike = {
@@ -49,7 +49,7 @@ export type DbUser = {
   id: string;
   name: string;
   email: string;
-  avatar_color: string;
+  avatar_url?: string | null;
   home_city: string;
 };
 
@@ -62,10 +62,10 @@ export type DbUserWithPasswordHash = DbUser & {
 export const BCRYPT_ROUNDS = Number(process.env.BCRYPT_ROUNDS ?? "12");
 
 export const USER_SELECT_COLUMNS =
-  'id, name, email, password_hash AS "passwordHash", avatar_color, home_city, updated_at, last_login_at';
+  'id, name, email, password_hash AS "passwordHash", avatar_url, home_city, updated_at, last_login_at';
 
 export const USER_PUBLIC_SELECT_COLUMNS =
-  "id, name, email, avatar_color, home_city";
+  "id, name, email, avatar_url, home_city";
 
 export const TRIP_SELECT_COLUMNS =
   "id, user_id, title, city, country, start_date, end_date, days, approximate_cost, currency, notes, created_at";

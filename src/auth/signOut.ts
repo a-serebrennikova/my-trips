@@ -4,10 +4,10 @@ import { signOut } from "../auth";
 
 export async function signOutUser() {
   try {
-    const result = await signOut({ redirectTo: "/" });
-
-    return result;
+    await signOut({ redirect: false });
+    return { ok: true };
   } catch (error) {
     console.error(error);
+    return { ok: false };
   }
 }
