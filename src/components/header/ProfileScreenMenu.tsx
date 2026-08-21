@@ -1,10 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { IconButton } from "@radix-ui/themes";
+import { Avatar, IconButton } from "@radix-ui/themes";
 import Link from "next/link";
 import { ProfileIcon } from "./icons";
 import { FullScreenMenu } from "@/src/components/common/FullScreenMenu";
+import { getNameLetter } from "@/src/utils/getNameLetter";
+import { useSessionUserData } from "@/src/hooks/useSessionUserData";
 
 interface IProps {
   isProfileActive: boolean;
@@ -13,6 +15,7 @@ interface IProps {
 
 export const ProfileScreenMenu = ({ isProfileActive, onSignOut }: IProps) => {
   const [open, setOpen] = useState(false);
+  const { avatarUrl, userName } = useSessionUserData();
 
   const handleSignOut = () => {
     onSignOut();
@@ -27,7 +30,14 @@ export const ProfileScreenMenu = ({ isProfileActive, onSignOut }: IProps) => {
         aria-label="Open profile menu"
         className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-transparent text-teal-50 transition hover:bg-teal-500/20 lg:hidden"
       >
-        <ProfileIcon />
+        <Avatar
+          src={avatarUrl}
+          alt={userName}
+          fallback={getNameLetter(userName)}
+          size="2"
+          radius="full"
+          color="grass"
+        />
       </IconButton>
 
       <FullScreenMenu

@@ -137,7 +137,12 @@ export const TripHeader = ({
           </div>
         </div>
         <div className="flex flex-col items-end gap-2">
-          <Avatar fallback={getNameLetter(author.name)} color="grass" />
+          <Avatar
+            src={author.avatarUrl ?? undefined}
+            alt={author.name}
+            fallback={getNameLetter(author.name)}
+            color="grass"
+          />
           <span className="text-standard font-semibold">{author.name}</span>
         </div>
       </div>

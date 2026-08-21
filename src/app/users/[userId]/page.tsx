@@ -8,6 +8,7 @@ import { Text } from "@radix-ui/themes";
 import notFound from "../../not-found";
 import { Divider } from "@/src/components/common/Divider";
 import { getStats } from "@/src/utils/getStats";
+import { getCurrentUserId } from "@/src/auth/session";
 
 export default async function UserProfilePage({
   params,
@@ -15,6 +16,7 @@ export default async function UserProfilePage({
   params: Promise<{ userId: string }>;
 }) {
   const { userId } = await params;
+  const currentUserId = await getCurrentUserId();
   const profileData = await getFriendProfileData(userId);
 
   if (!profileData) {
@@ -35,7 +37,11 @@ export default async function UserProfilePage({
           <span aria-hidden>←</span>
           Back to users
         </Link>
-        <UserProfileHeader user={user} stats={stats} />
+        <UserProfileHeader
+          user={user}
+          stats={stats}
+          currentUserId={currentUserId}
+        />
       </Card>
 
       <section className="flex flex-col flex-1">

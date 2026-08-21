@@ -7,13 +7,13 @@ import { EmailIcon } from "../common/icons/Email";
 import { LocationPinIcon } from "../common/icons/LocationPin";
 
 interface Props {
-  friends: FriendSummary[];
+  users: FriendSummary[];
 }
 
-export function UsersList({ friends }: Props) {
+export function UsersList({ users }: Props) {
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
-      {friends.map(({ user, tripsCount }) => {
+      {users.map(({ user, tripsCount }) => {
         const totalTrips = tripsCount;
 
         const { email, homeCity, id, name } = user;
@@ -23,7 +23,12 @@ export function UsersList({ friends }: Props) {
             <Link href={`/users/${id}`}>
               <Flex justify="between">
                 <Flex gap="3">
-                  <Avatar fallback={getNameLetter(name)} color="grass" />
+                  <Avatar
+                    src={user.avatarUrl ?? undefined}
+                    alt={name}
+                    fallback={getNameLetter(name)}
+                    color="grass"
+                  />
                   <div className="min-w-0">
                     <p className="page-title font-semibold leading-none tracking-tight text-slate-900">
                       {name}

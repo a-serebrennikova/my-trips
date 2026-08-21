@@ -42,7 +42,7 @@ async function loadTripsByQuery(
       [tripIds],
     ),
     query<DbCommentWithAuthor>(
-      `SELECT c.id, c.trip_id, c.author_id, c.message, c.created_at, u.name as author_name, u.avatar_color
+      `SELECT c.id, c.trip_id, c.author_id, c.message, c.created_at, u.name as author_name, u.avatar_url
        FROM comments c
        LEFT JOIN users u ON c.author_id = u.id
        WHERE c.trip_id = ANY($1::text[])`,
@@ -131,7 +131,7 @@ export async function getUserTravelData(
   userId: string,
 ): Promise<{ trips: Trip[] }> {
   const trips = await loadTripsByQuery(
-    `SELECT trips.id, trips.user_id, trips.title, trips.city, trips.country, trips.start_date, trips.end_date, trips.days, trips.approximate_cost, trips.currency, trips.notes, trips.created_at, u.name as author_name, u.avatar_color FROM trips 
+    `SELECT trips.id, trips.user_id, trips.title, trips.city, trips.country, trips.start_date, trips.end_date, trips.days, trips.approximate_cost, trips.currency, trips.notes, trips.created_at, u.name as author_name, u.avatar_url FROM trips 
      LEFT JOIN users u ON trips.user_id = u.id 
      WHERE trips.user_id = $1 ORDER BY trips.created_at DESC`,
     [userId],
@@ -147,7 +147,7 @@ async function getAllTravelDataRaw(
     query<DbUser>(`SELECT ${USER_PUBLIC_SELECT_COLUMNS} FROM users`),
     query<{ count: string }>(`SELECT COUNT(*)::text AS count FROM trips`),
     loadTripPreviewsByQuery(
-      `SELECT trips.id, trips.user_id, trips.title, trips.city, trips.country, trips.start_date, trips.end_date, trips.days, trips.approximate_cost, trips.currency, trips.notes, trips.created_at, u.name as author_name, u.avatar_color FROM trips
+      `SELECT trips.id, trips.user_id, trips.title, trips.city, trips.country, trips.start_date, trips.end_date, trips.days, trips.approximate_cost, trips.currency, trips.notes, trips.created_at, u.name as author_name, u.avatar_url FROM trips
        LEFT JOIN users u ON trips.user_id = u.id
        ORDER BY trips.created_at DESC LIMIT $1 OFFSET $2`,
       [limit, offset],
@@ -163,7 +163,7 @@ async function getAllTravelDataRaw(
 
 async function getTripByIdRaw(tripId: string): Promise<Trip | undefined> {
   const trips = await loadTripsByQuery(
-    `SELECT trips.id, trips.user_id, trips.title, trips.city, trips.country, trips.start_date, trips.end_date, trips.days, trips.approximate_cost, trips.currency, trips.notes, trips.created_at, u.name as author_name, u.avatar_color FROM trips
+    `SELECT trips.id, trips.user_id, trips.title, trips.city, trips.country, trips.start_date, trips.end_date, trips.days, trips.approximate_cost, trips.currency, trips.notes, trips.created_at, u.name as author_name, u.avatar_url FROM trips
      LEFT JOIN users u ON trips.user_id = u.id
      WHERE trips.id = $1 LIMIT 1`,
     [tripId],
@@ -172,14 +172,13 @@ async function getTripByIdRaw(tripId: string): Promise<Trip | undefined> {
 }
 
 async function getFriendsSummaryRaw(
-  currentUserId: string,
+  currentUserId: string | null,
 ): Promise<FriendSummary[]> {
-  const result = await query<DbFriendSummaryRow>(
-    `SELECT
+  const baseQuery = `SELECT
        u.id,
        u.name,
        u.email,
-       u.avatar_color,
+       u.avatar_url,
        u.home_city,
        COALESCE(stats.trips_count, 0)::int AS trips_count,
        COALESCE(stats.likes_received, 0)::int AS likes_received,
@@ -198,10 +197,14 @@ async function getFriendsSummaryRaw(
          GROUP BY trip_id
        ) like_stats ON like_stats.trip_id = t.id
        GROUP BY t.user_id
-     ) stats ON stats.user_id = u.id
-     WHERE u.id <> $1
-     ORDER BY COALESCE(stats.trips_count, 0) DESC, u.name ASC`,
-    [currentUserId],
+     ) stats ON stats.user_id = u.id`;
+
+  const whereClause = currentUserId ? " WHERE u.id <> $1" : "";
+  const orderByClause =
+    " ORDER BY COALESCE(stats.trips_count, 0) DESC, u.name ASC";
+  const result = await query<DbFriendSummaryRow>(
+    `${baseQuery}${whereClause}${orderByClause}`,
+    currentUserId ? [currentUserId] : [],
   );
 
   return result.rows.map((row) => ({
@@ -221,7 +224,7 @@ async function getFriendProfileDataRaw(
       [userId],
     ),
     loadTripPreviewsByQuery(
-      `SELECT trips.id, trips.user_id, trips.title, trips.city, trips.country, trips.start_date, trips.end_date, trips.days, trips.approximate_cost, trips.currency, trips.notes, trips.created_at, u.name as author_name, u.avatar_color FROM trips
+      `SELECT trips.id, trips.user_id, trips.title, trips.city, trips.country, trips.start_date, trips.end_date, trips.days, trips.approximate_cost, trips.currency, trips.notes, trips.created_at, u.name as author_name, u.avatar_url FROM trips
        LEFT JOIN users u ON trips.user_id = u.id
        WHERE trips.user_id = $1 ORDER BY trips.created_at DESC`,
       [userId],
@@ -267,23 +270,33 @@ async function getFriendProfileDataRaw(
 export const getAllTravelData = unstable_cache(
   getAllTravelDataRaw,
   ["all-travel-data"],
-  { revalidate: READ_MODEL_REVALIDATE_SECONDS },
+  {
+    revalidate: READ_MODEL_REVALIDATE_SECONDS,
+    tags: ["all-travel-data"],
+  },
 );
 
 export const getTripById = unstable_cache(getTripByIdRaw, ["trip-by-id"], {
   revalidate: READ_MODEL_REVALIDATE_SECONDS,
+  tags: ["trip-by-id"],
 });
 
 export const getFriendsSummary = unstable_cache(
   getFriendsSummaryRaw,
   ["friends-summary"],
-  { revalidate: READ_MODEL_REVALIDATE_SECONDS },
+  {
+    revalidate: READ_MODEL_REVALIDATE_SECONDS,
+    tags: ["friends-summary"],
+  },
 );
 
 export const getFriendProfileData = unstable_cache(
   getFriendProfileDataRaw,
   ["friend-profile-data"],
-  { revalidate: READ_MODEL_REVALIDATE_SECONDS },
+  {
+    revalidate: READ_MODEL_REVALIDATE_SECONDS,
+    tags: ["friend-profile-data"],
+  },
 );
 
 export async function createTrip(
@@ -417,7 +430,7 @@ export async function createComment(
   );
 
   const userResult = await query<DbUser>(
-    `SELECT id, name, avatar_color FROM users WHERE id = $1 LIMIT 1`,
+    `SELECT id, name, avatar_url FROM users WHERE id = $1 LIMIT 1`,
     [authorId],
   );
 
@@ -430,7 +443,7 @@ export async function createComment(
     author: {
       id: authorId,
       name: author?.name || "Unknown",
-      avatarColor: author?.avatar_color || "gray",
+      avatarUrl: author?.avatar_url ?? null,
     },
     message: normalizedMessage,
     createdAt,

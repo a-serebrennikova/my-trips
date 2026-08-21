@@ -7,7 +7,6 @@ type CreateUserAuthInput = {
   name: string;
   homeCity: string;
   passwordHash: string;
-  avatarColor?: string;
 };
 
 export async function getUserAuthByEmail(
@@ -36,22 +35,14 @@ export async function createUserAuth({
   name,
   homeCity,
   passwordHash,
-  avatarColor = "teal",
 }: CreateUserAuthInput): Promise<string> {
   const normalizedEmail = email.trim().toLowerCase();
 
   const result = await query<{ id: string }>(
-    `INSERT INTO users (id, name, email, password_hash, avatar_color, home_city, updated_at)
-     VALUES ($1, $2, $3, $4, $5, $6, NOW())
+    `INSERT INTO users (id, name, email, password_hash, home_city, updated_at)
+     VALUES ($1, $2, $3, $4, $5, NOW())
      RETURNING id`,
-    [
-      id,
-      name.trim(),
-      normalizedEmail,
-      passwordHash,
-      avatarColor,
-      homeCity.trim(),
-    ],
+    [id, name.trim(), normalizedEmail, passwordHash, homeCity.trim()],
   );
 
   return result.rows[0]?.id ?? id;

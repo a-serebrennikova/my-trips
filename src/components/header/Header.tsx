@@ -1,6 +1,6 @@
 "use client";
 
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { ProfileDropdown } from "./ProfileDropdown";
 import { ProfileScreenMenu } from "./ProfileScreenMenu";
 import { appConfig } from "../../config/app.config";
@@ -11,13 +11,13 @@ import { LoginForm } from "../authForms/LoginForm";
 import { RegisterForm } from "../authForms/RegisterForm";
 import { useState } from "react";
 import { Button } from "@radix-ui/themes";
-import { signOutUser } from "@/src/auth/signOut";
-import { useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 
 type AuthDialogView = "login" | "register" | null;
 
 export function Header() {
   const pathname = usePathname();
+  const router = useRouter();
   const isProfileActive = pathname === "/me";
   const [activeDialog, setActiveDialog] = useState<AuthDialogView>(null);
   const { status } = useSession();
@@ -34,7 +34,9 @@ export function Header() {
 
   const handleSignOut = async () => {
     try {
-      await signOutUser();
+      await signOut({ redirect: false });
+      router.replace("/");
+      router.refresh();
     } catch (error) {
       console.error("Error signing out:", error);
     }
@@ -46,7 +48,7 @@ export function Header() {
         <Logo />
 
         <div className="flex justify-center">
-          <nav className="max-lg:hidden lg:flex h-9 items-center gap-1 rounded-2xl bg-teal-600 p-1.5 shadow-sm">
+          <nav className="max-lg:hidden lg:flex h-9 items-center gap-1 ">
             {appConfig.routes.map((route) => (
               <NavLink key={route.href} href={route.href} label={route.label} />
             ))}

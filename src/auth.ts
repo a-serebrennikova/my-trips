@@ -60,10 +60,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth(() => {
 
             return {
               id: user.id,
+              image: user.avatar_url ?? null,
               email: user.email,
               name: user.name,
               homeCity: user.home_city,
-              avatarColor: user.avatar_color,
+              avatarUrl: user.avatar_url ?? null,
               updatedAt: user.updated_at,
             };
           } catch {
@@ -75,25 +76,20 @@ export const { handlers, signIn, signOut, auth } = NextAuth(() => {
     callbacks: {
       async jwt({ token, user }) {
         if (user) {
+          token.picture = user.image ?? null;
           token.userId = user.id;
-          // token.homeCity = (user as { homeCity?: string }).homeCity ?? null;
-          // token.avatarColor =
-          //   (user as { avatarColor?: string }).avatarColor ?? null;
-          // token.userUpdatedAt =
-          //   (user as { updatedAt?: string }).updatedAt ?? null;
+          token.name = user.name;
+          token.avatarUrl = user.avatarUrl;
         }
 
         return token;
       },
       async session({ session, token }) {
         if (session.user) {
-          session.user.id = (token.userId as string) ?? "";
-          // session.user.homeCity =
-          //   (token.homeCity as string | null | undefined) ?? null;
-          // session.user.avatarColor =
-          //   (token.avatarColor as string | null | undefined) ?? null;
-          // session.user.updatedAt =
-          //   (token.userUpdatedAt as string | null | undefined) ?? null;
+          const userId = typeof token.userId === "string" ? token.userId : "";
+
+          session.user.id = userId;
+          session.user.avatarUrl = token.picture ;
         }
 
         return session;
