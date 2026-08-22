@@ -33,7 +33,7 @@ export const UserProfileHeader = ({
 
   return (
     <>
-      <section className="flex lg:flex-row justify-between">
+      <section className="flex lg:flex-row justify-between gap-1">
         <div className="flex flex-col gap-4 sm:items-start">
           <div className="flex items-center gap-4">
             <Avatar
@@ -60,7 +60,7 @@ export const UserProfileHeader = ({
           </div>
         </div>
 
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4 align-items-end">
           <div className="flex justify-end">
             {isCurrentUser && (
               <IconActionButton
@@ -71,7 +71,7 @@ export const UserProfileHeader = ({
               </IconActionButton>
             )}
           </div>
-          <div className="flex flex-wrap gap-2 lg:justify-end">
+          <div className="flex flex-wrap gap-2 justify-end">
             {stats.map(({ label, value, color }) => (
               <Badge key={`label-${color}`} color={color} size="1">
                 {label}: {value}

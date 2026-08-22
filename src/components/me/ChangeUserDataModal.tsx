@@ -6,7 +6,7 @@ import { updateUserProfileRequest } from "@/src/service/request";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, Dialog, Flex, Text, TextField } from "@radix-ui/themes";
 import { useRouter } from "next/navigation";
-import { useRef } from "react";
+import { useCallback, useState } from "react";
 import { useForm } from "react-hook-form";
 import {
   notifyError,
@@ -17,6 +17,8 @@ import {
   ProfileFormValues,
   profileFormSchema,
 } from "../../schemas/profileSchema";
+
+import { UploadAvatar } from "./components/UploadAvatar";
 
 type ChangeUserDataModalProps = {
   open: boolean;
@@ -29,58 +31,35 @@ export const ChangeUserDataModal = ({
   open,
   onOpenChange,
 }: ChangeUserDataModalProps) => {
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
   const router = useRouter();
+  const [file, setFile] = useState<File | null>(null);
+  const [fileError, setFileError] = useState<string | null>(null);
 
   const {
     handleSubmit,
-    setValue,
     register,
-    watch,
     formState: { isSubmitting, errors },
   } = useForm<ProfileFormValues>({
+    mode: "onSubmit",
     resolver: zodResolver(profileFormSchema),
     defaultValues: {
       name: user.name,
       email: user.email,
-      avatar: null,
+      homeCity: user.homeCity,
     },
   });
 
-  // eslint-disable-next-line react-hooks/incompatible-library
-  const watchedAvatar = watch("avatar");
-
-  const avatarStatusText =
-    watchedAvatar instanceof File
-      ? watchedAvatar.name
-      : user.avatarUrl && user.avatarUrl.trim()
-        ? "Current avatar"
-        : "No file selected";
-
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-
-    if (!file) {
-      setValue("avatar", null);
-      return;
-    }
-
-    if (file.size > MAX_AVATAR_SIZE_BYTES) {
-      setValue("avatar", null);
-      event.target.value = "";
-      return;
-    }
-
-    setValue("avatar", file);
-  };
-
   const submitHandler = handleSubmit(async (values: ProfileFormValues) => {
-    const file = values.avatar;
     const name = values.name.trim();
     const email = values.email.trim();
+    const homeCity = values.homeCity.trim();
 
+    const isUploadedFile = file instanceof File;
     const hasProfileChanged =
-      name !== user.name || email !== user.email || file instanceof File;
+      name !== user.name ||
+      email !== user.email ||
+      homeCity !== user.homeCity ||
+      isUploadedFile;
 
     if (!hasProfileChanged) {
       onOpenChange(false);
@@ -88,34 +67,25 @@ export const ChangeUserDataModal = ({
     }
 
     try {
-      const payload: Record<string, string> = {};
-
-      if (file instanceof File) {
+      if (isUploadedFile) {
         const formData = new FormData();
         formData.append("avatar", file);
-
-        if (name !== user.name) {
-          formData.append("name", name);
-        }
-
-        if (email !== user.email) {
-          formData.append("email", email);
-        }
+        formData.append("name", name);
+        formData.append("email", email);
+        formData.append("homeCity", homeCity);
 
         await updateUserProfileRequest(formData);
       } else {
-        if (name !== user.name) {
-          payload.name = name;
-        }
-
-        if (email !== user.email) {
-          payload.email = email;
-        }
+        const payload: Record<string, string> = {
+          name,
+          email,
+          homeCity,
+        };
 
         await updateUserProfileRequest(payload);
       }
 
-      setValue("avatar", null);
+      setFile(null);
       router.refresh();
       notifySuccess("Profile updated successfully");
       onOpenChange(false);
@@ -123,6 +93,27 @@ export const ChangeUserDataModal = ({
       notifyError("Failed to update profile.");
     }
   });
+
+  const onValueChange = (files: File[]) => {
+    const file = files[0] ?? null;
+    setFile(file);
+  };
+
+  const onFileValidate = useCallback((file: File): string | null => {
+    if (!file.type.startsWith("image/")) {
+      return "Only image files are allowed";
+    }
+
+    if (file.size > MAX_AVATAR_SIZE_BYTES) {
+      return `File size must be less than ${MAX_AVATAR_SIZE_BYTES / (1024 * 1024)}MB`;
+    }
+
+    return null;
+  }, []);
+
+  const onFileReject = useCallback((file: File, message: string) => {
+    setFileError(`"${file.name}" has been rejected: ${message}`);
+  }, []);
 
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
@@ -139,7 +130,7 @@ export const ChangeUserDataModal = ({
                 Name
               </Text>
               <TextField.Root
-                placeholder="Your name"
+                placeholder="Enter your name"
                 color={errors.name ? "red" : undefined}
                 {...register("name")}
               />
@@ -152,36 +143,33 @@ export const ChangeUserDataModal = ({
               </Text>
               <TextField.Root
                 type="email"
-                placeholder="your@email.com"
+                placeholder="Enter your email"
                 color={errors.email ? "red" : undefined}
                 {...register("email")}
               />
               <ErrorText error={errors.email?.message} />
             </div>
 
-            <div className="flex flex-col items-center gap-3">
-              <Button
-                type="button"
-                variant="soft"
-                onClick={() => fileInputRef.current?.click()}
-              >
-                Upload photo
-              </Button>
-
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={handleFileChange}
-              />
-
-              <Text as="p" size="2" className="text-slate-600">
-                {avatarStatusText}
+            <div className="space-y-1.5">
+              <Text as="label" size="2" weight="medium" className="block">
+                Home city
               </Text>
-
-              {errors.avatar && <ErrorText error={errors.avatar?.message} />}
+              <TextField.Root
+                placeholder="Enter your home city"
+                color={errors.homeCity ? "red" : undefined}
+                {...register("homeCity")}
+              />
+              <ErrorText error={errors.homeCity?.message} />
             </div>
+
+            <UploadAvatar
+              file={file}
+              onFileValidate={onFileValidate}
+              onValueChange={onValueChange}
+              onFileReject={onFileReject}
+              avatarUrl={user.avatarUrl}
+            />
+            {fileError && <ErrorText error={fileError} />}
 
             <Flex gap="3" justify="end" mt="2">
               <Dialog.Close>

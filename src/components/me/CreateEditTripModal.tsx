@@ -57,6 +57,7 @@ export const CreateEditTripModal = ({
     control,
     formState: { errors, isSubmitting, isDirty },
   } = useForm<TripFormValues>({
+    mode: "onSubmit",
     resolver: zodResolver(tripFormSchema),
     defaultValues: { ...defaultValues, ...initialValues },
   });
@@ -111,9 +112,7 @@ export const CreateEditTripModal = ({
               {...register("title")}
               className={errors.title ? invalidFieldClassName : undefined}
             />
-            {errors.title && (
-              <ErrorText error={errors.title?.message} />
-            )}
+            {errors.title && <ErrorText error={errors.title?.message} />}
           </div>
 
           <Flex gap="3" direction={{ initial: "column", sm: "row" }}>
@@ -127,9 +126,7 @@ export const CreateEditTripModal = ({
                 {...register("city")}
                 className={errors.city ? invalidFieldClassName : undefined}
               />
-              {errors.city && (
-                <ErrorText error={errors.city?.message} />
-              )}
+              {errors.city && <ErrorText error={errors.city?.message} />}
             </div>
 
             <div className="w-full space-y-1.5">
@@ -142,9 +139,7 @@ export const CreateEditTripModal = ({
                 {...register("country")}
                 className={errors.country ? invalidFieldClassName : undefined}
               />
-              {errors.country && (
-                <ErrorText error={errors.country?.message} />
-              )}
+              {errors.country && <ErrorText error={errors.country?.message} />}
             </div>
           </Flex>
 
@@ -174,9 +169,7 @@ export const CreateEditTripModal = ({
                 {...register("endDate")}
                 className={errors.endDate ? invalidFieldClassName : undefined}
               />
-              {errors.endDate && (
-                <ErrorText error={errors.endDate?.message} />
-              )}
+              {errors.endDate && <ErrorText error={errors.endDate?.message} />}
             </div>
           </Flex>
 
@@ -245,9 +238,7 @@ export const CreateEditTripModal = ({
               {...register("notes")}
               className={errors.notes ? invalidFieldClassName : undefined}
             />
-            {errors.notes && (
-              <ErrorText error={errors.notes?.message} />
-            )}
+            {errors.notes && <ErrorText error={errors.notes?.message} />}
           </div>
 
           <Flex gap="3" justify="end" mt="5">

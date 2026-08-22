@@ -17,6 +17,7 @@ export type Place = {
   name: string;
   city: string;
   note?: string;
+  photos?: string[];
 };
 
 export type Comment = {
@@ -50,6 +51,7 @@ export type Trip = {
   approximateCost: number;
   currency: Currency;
   notes?: string;
+  photos?: string[];
   attractions: Place[];
   cafes: Place[];
   createdAt: string;

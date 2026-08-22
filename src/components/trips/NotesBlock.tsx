@@ -1,15 +1,22 @@
 import { Trip } from "@/src/types";
-import { Card } from "../common/Card";
+import { Flex } from "@radix-ui/themes";
 
 export const NotesBlock = ({ notes }: { notes: Required<Trip["notes"]> }) => {
   return (
-    <Card className="flex-1">
-      {notes && (
+    <Flex direction="column" gap="4" className="w-full">
+      {notes?.length ? (
         <>
           <p className="card-title">Notes:</p>
           <p className="text-standard">{notes}</p>
         </>
+      ) : (
+        <>
+          <p className="card-title">Notes:</p>
+          <Flex direction="column" className="justify-center items-center">
+            <p className="text-standard">No notes yet.</p>
+          </Flex>
+        </>
       )}
-    </Card>
+    </Flex>
   );
 };

@@ -2,11 +2,13 @@ import { getTripById } from "@/src/db/trips";
 import notFound from "../../not-found";
 import { CommentsBlock } from "@/src/components/trips/comments/CommentsBlock";
 import { TripHeader } from "@/src/components/trips/TripHeader";
-import { CafesBlock } from "@/src/components/trips/CafesBlock";
-import { AttractionsBlock } from "@/src/components/trips/AttractionsBlock";
 import { NotesBlock } from "@/src/components/trips/NotesBlock";
 import { getCurrentUserId } from "@/src/auth/session";
-import { Flex } from "@radix-ui/themes";
+import { Flex, Tabs } from "@radix-ui/themes";
+import { PlaceBlock } from "@/src/components/common/PlaceBlock";
+import { Card } from "@/src/components/common/Card";
+import { NoPhoto } from "@/src/components/common/NoPhoto";
+import Carousel from "@/src/components/common/Carousel/Carousel";
 
 export default async function TripDetailPage({
   params,
@@ -21,42 +23,68 @@ export default async function TripDetailPage({
     return notFound();
   }
 
-  const { attractions, cafes, comments, notes } = trip;
+  const { attractions, cafes, comments, photos, notes } = trip;
   const currentUserId = await getCurrentUserId();
+
+  const tabs = [
+    {
+      id: "overview",
+      title: "Overview",
+    },
+    {
+      id: "cafes",
+      title: "Cafes",
+    },
+    {
+      id: "attractions",
+      title: "Attractions",
+    },
+  ];
 
   return (
     <>
       <TripHeader trip={trip} tripId={tripId} />
-      <Flex direction="column" gap="4" className="w-full">
-        <Flex gap="4" direction="row" className="w-full">
-          {!!notes && (
-            <div className="w-full flex flexbasis-1">
+      <Tabs.Root defaultValue="overview" className="flex flex-col flex-1">
+        <Tabs.List aria-label="Trip content tabs" className="mx-4">
+          {tabs.map((tab) => (
+            <Tabs.Trigger key={tab.id} value={tab.id}>
+              {tab.title}
+            </Tabs.Trigger>
+          ))}
+        </Tabs.List>
+        <Tabs.Content value="overview" className="flex flex-col flex-1">
+          <Card className="flex-1 gap-4" >
+            <div className="flex flex-col lg:flex-row gap-4">
               <NotesBlock notes={notes} />
+              <Flex direction="column" gap="4" className="w-full">
+                <CommentsBlock
+                  comments={comments}
+                  tripId={tripId}
+                  currentUserId={currentUserId}
+                />
+              </Flex>
             </div>
-          )}
-
-          <Flex direction="column" gap="4" className="w-full">
-            {!!cafes.length && (
-              <div className="w-full flex flexbasis-1">
-                <CafesBlock cafes={cafes} />
-              </div>
-            )}
-            {!!attractions.length && (
-              <div className="w-full flex flexbasis-1">
-                <AttractionsBlock attractions={attractions} />
-              </div>
-            )}
-          </Flex>
-        </Flex>
-
-        {(!!comments.length || !!currentUserId) && (
-          <CommentsBlock
-            comments={comments}
-            tripId={tripId}
-            currentUserId={currentUserId}
+            <Flex flexGrow='1'>
+              {photos?.length ? (
+                <Carousel slides={photos} options={{ loop: true }} />
+              ) : (
+                <div className="flex flex-col flex-1 w-full min-h-60">
+                  <NoPhoto />
+                </div>
+              )}
+            </Flex>
+          </Card>
+        </Tabs.Content>
+        <Tabs.Content value="cafes" className="flex flex-col flex-1">
+          <PlaceBlock places={cafes} noDataText="No cafes added yet." />
+        </Tabs.Content>
+        <Tabs.Content value="attractions" className="flex flex-col flex-1">
+          <PlaceBlock
+            places={attractions}
+            noDataText="No attractions added yet."
           />
-        )}
-      </Flex>
+        </Tabs.Content>
+      </Tabs.Root>
     </>
   );
 }

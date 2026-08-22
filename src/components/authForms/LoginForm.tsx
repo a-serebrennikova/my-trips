@@ -9,6 +9,7 @@ import { useForm } from "react-hook-form";
 import { type LoginFormValues, loginFormSchema } from "@/src/schemas/authForms";
 import { signInUser } from "@/src/auth/signIn";
 import { notifyError } from "../common/Notification/notificationBus";
+import { ErrorText } from "../common/ErrorText";
 
 type LoginFormProps = {
   open: boolean;
@@ -20,8 +21,6 @@ const defaultValues: LoginFormValues = {
   email: "",
   password: "",
 };
-
-const invalidFieldClassName = "ring-1 ring-red-500";
 
 export function LoginForm({
   open,
@@ -37,6 +36,7 @@ export function LoginForm({
     formState: { errors, isSubmitting },
     reset,
   } = useForm<LoginFormValues>({
+    mode: "onSubmit",
     resolver: zodResolver(loginFormSchema),
     defaultValues,
   });
@@ -65,7 +65,7 @@ export function LoginForm({
 
       reset(defaultValues);
       onOpenChange(false);
-      
+
       router.push("/me");
       router.refresh();
     } catch {
@@ -100,18 +100,12 @@ export function LoginForm({
             </Text>
             <TextField.Root
               type="email"
-              placeholder="name@example.com"
+              placeholder="Enter your email"
               color={errors.email ? "red" : undefined}
               {...register("email")}
-              className={errors.email ? invalidFieldClassName : undefined}
             />
-            {errors.email && (
-              <Text as="p" size="1" className="text-red-600">
-                {errors.email.message}
-              </Text>
-            )}
+            {errors.email && <ErrorText error={errors.email.message} />}
           </div>
-
           <div className="space-y-1.5">
             <Text as="label" size="2" weight="medium" className="block">
               Password
@@ -121,25 +115,14 @@ export function LoginForm({
               placeholder="Enter your password"
               color={errors.password ? "red" : undefined}
               {...register("password")}
-              className={errors.password ? invalidFieldClassName : undefined}
             />
-            {errors.password && (
-              <Text as="p" size="1" className="text-red-600">
-                {errors.password.message}
-              </Text>
-            )}
+            {errors.password && <ErrorText error={errors.password.message} />}
           </div>
-
           {serverError && (
-            <Text
-              as="p"
-              size="2"
-              className="rounded-xl bg-red-50 px-3 py-2 text-red-700"
-            >
+            <Text as="p" size="2" className="text-red-500">
               {serverError}
             </Text>
           )}
-
           <Flex direction="column" gap="2" mt="3">
             <Button
               type="submit"
