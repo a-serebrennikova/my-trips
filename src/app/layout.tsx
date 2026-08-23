@@ -34,9 +34,9 @@ export default async function RootLayout({
             <Header />
             <main
               style={{ height: `calc(100vh - ${appConfig.headerHeight}px)` }}
-              className="flex flex-col flex-1 pb-10 pt-5 sm:pt-6"
+              className="flex flex-col flex-1 p-4"
             >
-              <div className="flex flex-col flex-1 mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+              <div className="flex flex-col flex-1 mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 overflow-auto">
                 <div className="flex flex-col flex-1 space-y-5">{children}</div>
               </div>
             </main>

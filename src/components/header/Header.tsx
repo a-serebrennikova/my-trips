@@ -44,7 +44,7 @@ export function Header() {
 
   return (
     <header className="border-b border-teal-200 bg-teal-700 text-teal-50">
-      <div className="grid w-full grid-cols-[auto_1fr_auto] items-center gap-4 px-4 py-3 sm:px-6 lg:px-8">
+      <div className="grid w-full grid-cols-[auto_1fr_auto] items-center gap-1 px-4 py-3 sm:px-6 lg:px-8">
         <Logo />
 
         <div className="flex justify-center">

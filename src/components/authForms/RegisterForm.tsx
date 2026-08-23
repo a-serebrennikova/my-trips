@@ -10,6 +10,7 @@ import {
 } from "@/src/schemas/authForms";
 import { registerUser } from "@/src/auth/registerUser";
 import { notifyError } from "../common/Notification/notificationBus";
+import { ErrorText } from "../common/ErrorText";
 
 type RegisterFormProps = {
   open: boolean;
@@ -25,8 +26,6 @@ const defaultValues: RegisterFormValues = {
   homeCity: "",
 };
 
-const invalidFieldClassName = "ring-1 ring-red-500";
-
 export function RegisterForm({
   open,
   onOpenChange,
@@ -40,6 +39,7 @@ export function RegisterForm({
     formState: { errors, isSubmitting },
     reset,
   } = useForm<RegisterFormValues>({
+    mode: "onSubmit",
     resolver: zodResolver(registerFormSchema),
     defaultValues,
   });
@@ -107,16 +107,11 @@ export function RegisterForm({
               Name
             </Text>
             <TextField.Root
-              placeholder="Your name"
               color={errors.name ? "red" : undefined}
+              placeholder="Enter your name"
               {...register("name")}
-              className={errors.name ? invalidFieldClassName : undefined}
             />
-            {errors.name && (
-              <Text as="p" size="1" className="text-red-600">
-                {errors.name.message}
-              </Text>
-            )}
+            {errors.name && <ErrorText error={errors.name.message} />}
           </div>
 
           <div className="space-y-1.5">
@@ -124,16 +119,11 @@ export function RegisterForm({
               Home city
             </Text>
             <TextField.Root
-              placeholder="Lisbon"
+              placeholder="Enter your home city"
               color={errors.homeCity ? "red" : undefined}
               {...register("homeCity")}
-              className={errors.homeCity ? invalidFieldClassName : undefined}
             />
-            {errors.homeCity && (
-              <Text as="p" size="1" className="text-red-600">
-                {errors.homeCity.message}
-              </Text>
-            )}
+            {errors.homeCity && <ErrorText error={errors.homeCity.message} />}
           </div>
 
           <div className="space-y-1.5">
@@ -142,16 +132,11 @@ export function RegisterForm({
             </Text>
             <TextField.Root
               type="email"
-              placeholder="name@example.com"
+              placeholder="Enter your email"
               color={errors.email ? "red" : undefined}
               {...register("email")}
-              className={errors.email ? invalidFieldClassName : undefined}
             />
-            {errors.email && (
-              <Text as="p" size="1" className="text-red-600">
-                {errors.email.message}
-              </Text>
-            )}
+            {errors.email && <ErrorText error={errors.email.message} />}
           </div>
 
           <div className="space-y-1.5">
@@ -163,13 +148,8 @@ export function RegisterForm({
               placeholder="At least 8 characters"
               color={errors.password ? "red" : undefined}
               {...register("password")}
-              className={errors.password ? invalidFieldClassName : undefined}
             />
-            {errors.password && (
-              <Text as="p" size="1" className="text-red-600">
-                {errors.password.message}
-              </Text>
-            )}
+            {errors.password && <ErrorText error={errors.password.message} />}
           </div>
 
           <div className="space-y-1.5">
@@ -181,23 +161,14 @@ export function RegisterForm({
               placeholder="Repeat your password"
               color={errors.confirmPassword ? "red" : undefined}
               {...register("confirmPassword")}
-              className={
-                errors.confirmPassword ? invalidFieldClassName : undefined
-              }
             />
             {errors.confirmPassword && (
-              <Text as="p" size="1" className="text-red-600">
-                {errors.confirmPassword.message}
-              </Text>
+              <ErrorText error={errors.confirmPassword.message} />
             )}
           </div>
 
           {serverError && (
-            <Text
-              as="p"
-              size="2"
-              className="rounded-xl bg-red-50 px-3 py-2 text-red-700"
-            >
+            <Text as="p" size="2" className=" text-red-500">
               {serverError}
             </Text>
           )}

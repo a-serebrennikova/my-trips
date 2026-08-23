@@ -7,7 +7,7 @@ export const AnimatedText = () => {
   return (
     <h2 className="page-title">
       <Typewriter
-        words={["Keep all your best trips in one place"]}
+        words={["Keep all your trips in one place"]}
         loop={1}
         cursor={false}
         cursorStyle="|"

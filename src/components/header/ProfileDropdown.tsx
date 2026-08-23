@@ -1,9 +1,8 @@
-import { Avatar, IconButton } from "@radix-ui/themes";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import Link from "next/link";
 import { ProfileIcon } from "./icons";
-import { getNameLetter } from "@/src/utils/getNameLetter";
 import { useSessionUserData } from "@/src/hooks/useSessionUserData";
+import { ProfileButton } from "./ProfileButton";
 
 interface IProps {
   isProfileActive: boolean;
@@ -16,22 +15,7 @@ export const ProfileDropdown = ({ isProfileActive, onSignOut }: IProps) => {
   return (
     <DropdownMenu.Root>
       <DropdownMenu.Trigger asChild>
-        <IconButton
-          variant={isProfileActive ? "surface" : "solid"}
-          size="2"
-          radius="full"
-          className="max-lg:hidden lg:inline-flex"
-          aria-label="Open profile options"
-        >
-          <Avatar
-            src={avatarUrl}
-            alt={userName}
-            fallback={getNameLetter(userName)}
-            size="2"
-            radius="full"
-            color="grass"
-          />
-        </IconButton>
+        <ProfileButton avatarUrl={avatarUrl} userName={userName} />
       </DropdownMenu.Trigger>
 
       <DropdownMenu.Portal>

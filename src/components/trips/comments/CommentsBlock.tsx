@@ -26,6 +26,17 @@ export const CommentsBlock = ({
 }) => {
   const router = useRouter();
 
+  if (!comments.length && !currentUserId) {
+    return (
+      <Card className="gap-2 bg-(--orange-a3)">
+        <p className="card-title">Comments:</p>
+        <Flex direction="column" className="justify-center items-center">
+          <p className="text-standard">No comments yet.</p>
+        </Flex>
+      </Card>
+    );
+  }
+
   const deleteComment = async (commentId: string) => {
     try {
       await deleteTripComment(tripId, commentId);

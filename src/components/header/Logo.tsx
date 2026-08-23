@@ -14,7 +14,7 @@ export const Logo = () => {
       <div className="flex flex-col text-left">
         <span className="font-semibold leading-tight text-white">myTrips</span>
         <span className="font-semibold leading-tight text-white">
-          Your travel stories
+          Travel diary
         </span>
       </div>
     </Link>

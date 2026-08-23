@@ -20,6 +20,7 @@ import { ConfirmDialog } from "../common/ConfirmDialog";
 import { IconActionButton } from "../common/IconActionButton";
 import { Trash } from "../common/icons/Trash";
 import { useSession } from "next-auth/react";
+import { GoBackButton } from "../common/GoBackButton";
 
 export const TripHeader = ({
   trip,
@@ -69,13 +70,7 @@ export const TripHeader = ({
   return (
     <Card>
       <div className="flex justify-between">
-        <Link
-          href="/trips"
-          className="inline-flex items-center gap-2 text-standard font-medium text-sky-700 transition hover:text-sky-500"
-        >
-          <span aria-hidden>←</span>
-          <span>Back to trips</span>
-        </Link>
+        <GoBackButton />
         <Flex gap={"4"}>
           {isOwnTrip && (
             <IconActionButton
@@ -97,9 +92,9 @@ export const TripHeader = ({
         </Flex>
       </div>
 
-      <div className="mt-4 flex  justify-between gap-3 ">
-        <div className="mt-4 flex flex-col gap-3 lg:mt-0">
-          <div className="mt-2 flex flex-wrap items-center gap-3">
+      <div className="flex justify-between gap-3 ">
+        <div className="flex flex-col gap-3 lg:mt-0">
+          <div className="flex flex-wrap items-center gap-3">
             <h1 className="page-title">{title}</h1>
             <LikeButton
               tripId={tripId}
@@ -107,11 +102,6 @@ export const TripHeader = ({
               initialLikedByUserIds={likedByUserIds}
             />
           </div>
-          {!currentUserId && (
-            <p className="text-sm text-slate-500">
-              Sign in to like this trip and join the discussion.
-            </p>
-          )}
           <div className="flex flex-wrap gap-3">
             <Badge size="3" color={tagsColor.city}>
               <p className="inline-flex items-center gap-2">
@@ -136,15 +126,17 @@ export const TripHeader = ({
             </Badge>
           </div>
         </div>
-        <div className="flex flex-col items-end gap-2">
-          <Avatar
-            src={author.avatarUrl ?? undefined}
-            alt={author.name}
-            fallback={getNameLetter(author.name)}
-            color="grass"
-          />
-          <span className="text-standard font-semibold">{author.name}</span>
-        </div>
+        <Link href={`/users/${author.id}`}>
+          <div className="flex flex-col items-end gap-2">
+            <Avatar
+              src={author.avatarUrl ?? undefined}
+              alt={author.name}
+              fallback={getNameLetter(author.name)}
+              color="grass"
+            />
+            <span className="text-standard font-semibold">{author.name}</span>
+          </div>
+        </Link>
       </div>
 
       <CreateEditTripModal

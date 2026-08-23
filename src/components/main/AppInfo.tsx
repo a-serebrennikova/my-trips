@@ -1,33 +1,40 @@
 import Image from "next/image";
 import { LeadText } from "../common/Typography";
-import { RedirectLink } from "./RedirectLink";
 import { Card } from "../common/Card";
 import { AnimatedText } from "./AnimatedText";
+import Link from "next/link";
+import { Flex } from "@radix-ui/themes";
 
 export const AppInfo = () => {
   return (
     <Card>
       <div className="flex flex-col gap-6 lg:flex-row lg:justify-between">
-        <div className="flex flex-col gap-3">
-          <p className="pill self-start">PERSONAL TRAVEL DIARY</p>
-          <AnimatedText />
-
-          <LeadText className="mt-4 text-standard text-slate-600">
-            Add cities, impressions, favorite cafes, and share them with
-            friends.
-            <br />
-            Every trip is its own story with likes, notes, and comments.
-          </LeadText>
-
-          <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-            <RedirectLink
-              className="inline-flex items-center justify-center gap-2 rounded-full border border-teal-200 bg-white px-5 py-2.5 text-small font-semibold text-teal-700 transition hover:bg-teal-50"
-              signedInHref="/trips"
-              signedInLabel="View all trips →"
-            />
+        <Flex direction="column" justify="between" gap="2">
+          <div className="flex flex-col gap-3">
+            <p className="pill self-start">PERSONAL TRAVEL DIARY</p>
+            <div className="lg:min-h-10 sm:min-h-7 max-sm:min-h-14">
+              <AnimatedText />
+            </div>
           </div>
-        </div>
 
+          <div className="flex flex-col gap-3">
+            <LeadText className="mt-4 text-standard text-slate-600">
+              Add cities, impressions, favorite cafes, and share them with
+              friends.
+              <br />
+              Every trip is its own story with likes, notes, and comments.
+            </LeadText>
+
+            <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+              <Link
+                href="/trips"
+                className="hover:text-blue-600"
+              >
+                <span aria-hidden>View all trips →</span>
+              </Link>
+            </div>
+          </div>
+        </Flex>
         <div className="flex justify-center lg:justify-end">
           <Image
             src="/main-pic.png"

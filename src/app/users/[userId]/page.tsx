@@ -3,12 +3,12 @@ import { TripCardItem } from "@/src/components/common/TripCardItem";
 import type { UserProfileStat } from "@/src/components/common/UserProfileHeader";
 import { UserProfileHeader } from "@/src/components/common/UserProfileHeader";
 import { getFriendProfileData } from "@/src/db/trips";
-import Link from "next/link";
 import { Text } from "@radix-ui/themes";
 import notFound from "../../not-found";
 import { Divider } from "@/src/components/common/Divider";
 import { getStats } from "@/src/utils/getStats";
 import { getCurrentUserId } from "@/src/auth/session";
+import { GoBackButton } from "@/src/components/common/GoBackButton";
 
 export default async function UserProfilePage({
   params,
@@ -30,13 +30,7 @@ export default async function UserProfilePage({
   return (
     <>
       <Card className="flex flex-col gap-4">
-        <Link
-          href="/users"
-          className="inline-flex items-center gap-2 text-standard font-medium text-sky-700 transition hover:text-sky-500"
-        >
-          <span aria-hidden>←</span>
-          Back to users
-        </Link>
+        <GoBackButton />
         <UserProfileHeader
           user={user}
           stats={stats}
