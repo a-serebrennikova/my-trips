@@ -7,7 +7,7 @@ export const GoBackButton = () => {
 
   return (
     <button
-      className="hover:text-blue-600 self-start"
+      className="hover:text-teal-600 self-start"
       onClick={() => {
         router.back();
       }}

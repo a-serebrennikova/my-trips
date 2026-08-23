@@ -45,7 +45,7 @@ export default async function TripDetailPage({
     <>
       <TripHeader trip={trip} tripId={tripId} />
       <Tabs.Root defaultValue="overview" className="flex flex-col flex-1">
-        <Tabs.List aria-label="Trip content tabs" className="mx-4">
+        <Tabs.List aria-label="Trip content tabs" className="mx-6" >
           {tabs.map((tab) => (
             <Tabs.Trigger key={tab.id} value={tab.id}>
               {tab.title}

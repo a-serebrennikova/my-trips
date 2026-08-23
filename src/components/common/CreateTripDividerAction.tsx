@@ -14,7 +14,7 @@ export const CreateTripDividerAction = () => {
         className="shrink-0"
         ariaLabel="Create trip"
         variant="soft"
-        color="grass"
+        color="teal"
         onClick={() => setIsCreateTripModalOpen(true)}
       >
         <Plus />

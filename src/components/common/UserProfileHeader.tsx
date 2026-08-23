@@ -91,15 +91,13 @@ export const UserProfileHeader = ({
             ))}
           </div>
         </div>
-        <div className="w-25">
-          <Button
-            variant="soft"
-            color="red"
-            onClick={handleSignOut}
-          >
-            Sign out
-          </Button>
-        </div>
+        {isCurrentUser && (
+          <div className="w-25">
+            <Button variant="soft" color="red" onClick={handleSignOut}>
+              Sign out
+            </Button>
+          </div>
+        )}
       </section>
 
       {isEditModalOpen && (
