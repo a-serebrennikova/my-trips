@@ -68,18 +68,10 @@ export const TripHeader = ({
   };
 
   return (
-    <Card>
-      <div className="flex justify-between">
+    <Card className="gap-4 mb-4">
+      <div className="flex justify-between gap-1">
         <GoBackButton />
         <Flex gap={"4"}>
-          {isOwnTrip && (
-            <IconActionButton
-              ariaLabel="Edit trip"
-              onClick={() => setIsEditTripModalOpen(true)}
-            >
-              <Settings />
-            </IconActionButton>
-          )}
           {isOwnTrip && (
             <IconActionButton
               color="red"
@@ -89,11 +81,19 @@ export const TripHeader = ({
               <Trash />
             </IconActionButton>
           )}
+          {isOwnTrip && (
+            <IconActionButton
+              ariaLabel="Edit trip"
+              onClick={() => setIsEditTripModalOpen(true)}
+            >
+              <Settings />
+            </IconActionButton>
+          )}
         </Flex>
       </div>
 
-      <div className="flex justify-between gap-3 ">
-        <div className="flex flex-col gap-3 lg:mt-0">
+      <div className="flex justify-between gap-4 max-sm:flex-col">
+        <div className="flex flex-col gap-4">
           <div className="flex flex-wrap items-center gap-3">
             <h1 className="page-title">{title}</h1>
             <LikeButton
@@ -103,40 +103,42 @@ export const TripHeader = ({
             />
           </div>
           <div className="flex flex-wrap gap-3">
-            <Badge size="3" color={tagsColor.city}>
+            <Badge size="2" color={tagsColor.city}>
               <p className="inline-flex items-center gap-2">
                 <LocationIcon className="text-slate-400" />
                 {city}, {country}
               </p>
             </Badge>
 
-            <Badge size="3" color={tagsColor.days}>
+            <Badge size="2" color={tagsColor.days}>
               <ClockIcon className="text-slate-400" />
               {getDaysText(days)}
             </Badge>
 
-            <Badge size="3" color={tagsColor.period}>
+            <Badge size="2" color={tagsColor.period}>
               <CalendarIcon className="text-slate-400" />
               {tripDateRange}
             </Badge>
 
-            <Badge size="3" color={tagsColor.cost}>
+            <Badge size="2" color={tagsColor.cost}>
               <CalendarIcon className="text-slate-400" />
               {formatAmount(approximateCost, currency)}
             </Badge>
           </div>
         </div>
-        <Link href={`/users/${author.id}`}>
-          <div className="flex flex-col items-end gap-2">
-            <Avatar
-              src={author.avatarUrl ?? undefined}
-              alt={author.name}
-              fallback={getNameLetter(author.name)}
-              color="grass"
-            />
-            <span className="text-standard font-semibold">{author.name}</span>
-          </div>
-        </Link>
+        <div className="self-center max-sm:self-start">
+          <Link href={`/users/${author.id}`}>
+            <div className="flex flex-col gap-2">
+              <Avatar
+                src={author.avatarUrl ?? undefined}
+                alt={author.name}
+                fallback={getNameLetter(author.name)}
+                color="grass"
+              />
+              <span className="text-standard font-semibold">{author.name}</span>
+            </div>
+          </Link>
+        </div>
       </div>
 
       <CreateEditTripModal

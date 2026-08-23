@@ -10,6 +10,21 @@ import { Card } from "@/src/components/common/Card";
 import { NoPhoto } from "@/src/components/common/NoPhoto";
 import Carousel from "@/src/components/common/Carousel/Carousel";
 
+const tabs = [
+  {
+    id: "overview",
+    title: "Overview",
+  },
+  {
+    id: "cafes",
+    title: "Cafes",
+  },
+  {
+    id: "attractions",
+    title: "Attractions",
+  },
+];
+
 export default async function TripDetailPage({
   params,
 }: {
@@ -26,21 +41,6 @@ export default async function TripDetailPage({
   const { attractions, cafes, comments, photos, notes } = trip;
   const currentUserId = await getCurrentUserId();
 
-  const tabs = [
-    {
-      id: "overview",
-      title: "Overview",
-    },
-    {
-      id: "cafes",
-      title: "Cafes",
-    },
-    {
-      id: "attractions",
-      title: "Attractions",
-    },
-  ];
-
   return (
     <>
       <TripHeader trip={trip} tripId={tripId} />
@@ -53,7 +53,7 @@ export default async function TripDetailPage({
           ))}
         </Tabs.List>
         <Tabs.Content value="overview" className="flex flex-col flex-1">
-          <Card className="flex-1 gap-4" >
+          <Card className="flex-1 gap-4">
             <div className="flex flex-col lg:flex-row gap-4">
               <NotesBlock notes={notes} />
               <Flex direction="column" gap="4" className="w-full">
@@ -64,7 +64,7 @@ export default async function TripDetailPage({
                 />
               </Flex>
             </div>
-            <Flex flexGrow='1'>
+            <Flex flexGrow="1">
               {photos?.length ? (
                 <Carousel slides={photos} options={{ loop: true }} />
               ) : (

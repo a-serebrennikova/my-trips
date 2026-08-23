@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { IconButton } from "@radix-ui/themes";
 import Link from "next/link";
-import { BurgerIcon, HomeIcon, NAV_ICONS, ProfileIcon } from "./icons";
+import { BurgerIcon, HomeIcon, NAV_ICONS } from "./icons";
 import { appConfig } from "@/src/config/app.config";
 import { usePathname } from "next/navigation";
 import { FullScreenMenu } from "@/src/components/common/FullScreenMenu";
@@ -46,10 +46,6 @@ export const NavigationScreenMenu = () => {
                 }`}
               >
                 {(() => {
-                  if (route.href === "/me") {
-                    return <ProfileIcon />;
-                  }
-
                   const Icon = NAV_ICONS[route.href] ?? HomeIcon;
                   return <Icon />;
                 })()}

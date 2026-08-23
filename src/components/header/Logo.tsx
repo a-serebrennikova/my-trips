@@ -3,12 +3,12 @@ import Link from "next/link";
 
 export const Logo = () => {
   return (
-    <Link href={"/"} className="flex items-center gap-2">
+    <Link href={"/"} className="flex items-center">
       <Image
         src="/favicon.ico"
         alt="Profile icon"
-        width={36}
-        height={36}
+        width={40}
+        height={40}
         className="text-white"
       />
       <div className="flex flex-col text-left">

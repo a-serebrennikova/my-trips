@@ -30,13 +30,15 @@ export const UserProfilePage = async () => {
 
   return (
     <>
-      <Card className="flex flex-col gap-4">
-        <UserProfileHeader user={user} stats={stats} currentUserId={currentUserId} />
-      </Card>
+      <UserProfileHeader
+        user={user}
+        stats={stats}
+        currentUserId={currentUserId}
+      />
+
+      <Divider title={"Trips"} action={<CreateTripDividerAction />} />
 
       <section>
-        <Divider title={"Trips"} action={<CreateTripDividerAction />} />
-
         {userTrips.length === 0 ? (
           <Text as="p" className="text-standard text-slate-500">
             You do not have any saved trips yet.

@@ -1,4 +1,3 @@
-import { TripsIcon } from "./icons/TripsIcon";
 import { ReactNode } from "react";
 
 interface IProp {
@@ -8,9 +7,8 @@ interface IProp {
 
 export const Divider = ({ title, action }: IProp) => {
   return (
-    <div className="mb-4 flex items-center gap-3 text-teal-700">
+    <div className="mt-4 mb-4 flex items-center gap-3 text-teal-700">
       <div className="inline-flex items-center gap-2">
-        <TripsIcon />
         <p className="text-3xl font-semibold tracking-tight text-slate-900 sm:text-title">
           {title}
         </p>
