@@ -38,7 +38,7 @@ export const CreateComment = ({ tripId }: IProps) => {
   };
 
   return (
-    <>
+    <div className="flex flex-col gap-4">
       <TextArea
         placeholder="Write a comment..."
         className="w-full"
@@ -49,6 +49,6 @@ export const CreateComment = ({ tripId }: IProps) => {
       <Button style={{ width: 150 }} size={"2"} onClick={handleSubmit}>
         {isSubmitting ? "Adding..." : "Add comment"}
       </Button>
-    </>
+    </div>
   );
 };

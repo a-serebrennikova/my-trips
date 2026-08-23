@@ -8,7 +8,6 @@ import notFound from "../../not-found";
 import { Divider } from "@/src/components/common/Divider";
 import { getStats } from "@/src/utils/getStats";
 import { getCurrentUserId } from "@/src/auth/session";
-import { GoBackButton } from "@/src/components/common/GoBackButton";
 
 export default async function UserProfilePage({
   params,
@@ -29,18 +28,15 @@ export default async function UserProfilePage({
 
   return (
     <>
-      <Card className="flex flex-col gap-4">
-        <GoBackButton />
-        <UserProfileHeader
-          user={user}
-          stats={stats}
-          currentUserId={currentUserId}
-        />
-      </Card>
+      <UserProfileHeader
+        user={user}
+        stats={stats}
+        currentUserId={currentUserId}
+      />
+
+      <Divider title={"Trips"} />
 
       <section className="flex flex-col flex-1">
-        <Divider title={"Trips"} />
-
         {userTrips.length === 0 ? (
           <Card className="flex-1 items-center justify-center">
             <Text as="p" className="text-standard">

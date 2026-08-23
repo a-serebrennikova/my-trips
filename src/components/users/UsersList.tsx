@@ -3,8 +3,7 @@ import Link from "next/link";
 import { Card } from "../common/Card";
 import { getNameLetter } from "@/src/utils/getNameLetter";
 import { Avatar, Flex } from "@radix-ui/themes";
-import { EmailIcon } from "../common/icons/Email";
-import { LocationPinIcon } from "../common/icons/LocationPin";
+import { ContactInfo } from "../common/ContactInfo";
 
 interface Props {
   users: FriendSummary[];
@@ -21,7 +20,7 @@ export function UsersList({ users }: Props) {
         return (
           <Card key={id} className="h-full">
             <Link href={`/users/${id}`}>
-              <Flex justify="between">
+              <Flex justify="between" gap="3" direction="column">
                 <Flex gap="3">
                   <Avatar
                     src={user.avatarUrl ?? undefined}
@@ -38,16 +37,7 @@ export function UsersList({ users }: Props) {
                     </p>
                   </div>
                 </Flex>
-                <div>
-                  <div className="flex items-center gap-3">
-                    <EmailIcon className="h-4 w-4" />
-                    <span className="text-standard">{email}</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <LocationPinIcon className="h-4 w-4" />
-                    <span className="text-standard">{homeCity}</span>
-                  </div>
-                </div>
+                <ContactInfo email={email} homeCity={homeCity} />
               </Flex>
             </Link>
           </Card>

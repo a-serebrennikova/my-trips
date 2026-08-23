@@ -1,8 +1,5 @@
 "use client";
 
-import { usePathname, useRouter } from "next/navigation";
-import { ProfileDropdown } from "./ProfileDropdown";
-import { ProfileScreenMenu } from "./ProfileScreenMenu";
 import { appConfig } from "../../config/app.config";
 import { Logo } from "./Logo";
 import { NavigationScreenMenu } from "./NavigationScreenMenu";
@@ -11,14 +8,12 @@ import { LoginForm } from "../authForms/LoginForm";
 import { RegisterForm } from "../authForms/RegisterForm";
 import { useState } from "react";
 import { Button } from "@radix-ui/themes";
-import { signOut, useSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
+import { ProfileLinkIcon } from "./ProfileLinkIcon";
 
 type AuthDialogView = "login" | "register" | null;
 
 export function Header() {
-  const pathname = usePathname();
-  const router = useRouter();
-  const isProfileActive = pathname === "/me";
   const [activeDialog, setActiveDialog] = useState<AuthDialogView>(null);
   const { status } = useSession();
   const isAuthenticated = status === "authenticated";
@@ -30,16 +25,6 @@ export function Header() {
   };
   const handleRegisterDialogChange = (open: boolean) => {
     setActiveDialog(open ? "register" : null);
-  };
-
-  const handleSignOut = async () => {
-    try {
-      await signOut({ redirect: false });
-      router.replace("/");
-      router.refresh();
-    } catch (error) {
-      console.error("Error signing out:", error);
-    }
   };
 
   return (
@@ -60,20 +45,7 @@ export function Header() {
             <NavigationScreenMenu />
           </div>
           {isAuthenticated ? (
-            <>
-              <div className="lg:hidden">
-                <ProfileScreenMenu
-                  onSignOut={handleSignOut}
-                  isProfileActive={isProfileActive}
-                />
-              </div>
-              <div className="hidden lg:block">
-                <ProfileDropdown
-                  onSignOut={handleSignOut}
-                  isProfileActive={isProfileActive}
-                />
-              </div>
-            </>
+            <ProfileLinkIcon />
           ) : (
             <Button onClick={openLoginDialog}>Sign in</Button>
           )}
