@@ -2,6 +2,7 @@ import {
   CURRENCY,
   type Comment,
   type Currency,
+  type Photo,
   type Place,
   type Trip,
   type User,
@@ -9,6 +10,7 @@ import {
 import type {
   DbCommentWithAuthor,
   DbPlace,
+  DbPhoto,
   DbTripLike,
   DbTripWithAuthor,
   DbUser,
@@ -63,6 +65,7 @@ export function groupByTripId<T extends { trip_id: string }>(
 export function mapDbPlacesToPlaces(
   places: DbPlace[],
   type: "attraction" | "cafe",
+  photosByPlaceId: Map<string, Photo[]> = new Map(),
 ): Place[] {
   return places
     .filter((p) => p.type === type)
@@ -71,6 +74,22 @@ export function mapDbPlacesToPlaces(
       name: p.name,
       city: p.city,
       note: p.note ?? undefined,
+      photos: photosByPlaceId.get(p.id) ?? [],
+    }));
+}
+
+export function mapDbPhotosToPhotos(photos: DbPhoto[]): Photo[] {
+  return photos
+    .toSorted((first, second) => first.sort_order - second.sort_order)
+    .map((photo) => ({
+      id: photo.id,
+      url: photo.url,
+      publicId: photo.public_id,
+      format: photo.format,
+      bytes: photo.bytes,
+      width: photo.width,
+      height: photo.height,
+      sortOrder: photo.sort_order,
     }));
 }
 
@@ -93,12 +112,22 @@ export function mapDbTripToTrip(
   db: DbTripWithAuthor,
   related: {
     places: DbPlace[];
+    tripPhotos: DbPhoto[];
+    photosByPlaceId: Map<string, Photo[]>;
     comments: DbCommentWithAuthor[];
     likes: DbTripLike[];
   },
 ): Trip {
-  const attractions = mapDbPlacesToPlaces(related.places, "attraction");
-  const cafes = mapDbPlacesToPlaces(related.places, "cafe");
+  const attractions = mapDbPlacesToPlaces(
+    related.places,
+    "attraction",
+    related.photosByPlaceId,
+  );
+  const cafes = mapDbPlacesToPlaces(
+    related.places,
+    "cafe",
+    related.photosByPlaceId,
+  );
   const comments = mapDbCommentsToComments(related.comments);
 
   return {
@@ -114,6 +143,7 @@ export function mapDbTripToTrip(
     approximateCost: db.approximate_cost,
     currency: mapDbCurrencyToCurrency(db.currency),
     notes: db.notes ?? undefined,
+    photos: mapDbPhotosToPhotos(related.tripPhotos),
     attractions,
     cafes,
     createdAt: db.created_at,
@@ -139,6 +169,7 @@ export function mapDbTripToTripPreview(
     approximateCost: db.approximate_cost,
     currency: mapDbCurrencyToCurrency(db.currency),
     notes: db.notes ?? undefined,
+    photos: [],
     attractions: [],
     cafes: [],
     createdAt: db.created_at,

@@ -3,6 +3,7 @@ import { z } from "zod";
 export const emailSchema = z
   .string()
   .trim()
+  // FIXME use actual method for email
   .email("Enter a valid email address");
 export const nameSchema = z.string().trim().min(1, "Name is required");
 export const homeCitySchema = z.string().trim().min(1, "Home city is required");

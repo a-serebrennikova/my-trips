@@ -7,7 +7,7 @@ import { getNameLetter } from "@/src/utils/getNameLetter";
 import { Avatar, Badge, Button } from "@radix-ui/themes";
 import { Settings } from "./icons/Settings";
 import { IconActionButton } from "./IconActionButton";
-import { ChangeUserDataModal } from "@/src/components/me/ChangeUserDataModal";
+import { ChangeUserDataModal } from "@/src/components/me/profile/ChangeUserDataModal";
 import { Card } from "./Card";
 import { GoBackButton } from "./GoBackButton";
 import { ContactInfo } from "./ContactInfo";

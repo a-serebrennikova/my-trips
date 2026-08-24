@@ -14,7 +14,6 @@ import { getNameLetter } from "@/src/utils/getNameLetter";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Settings } from "../common/icons/Settings";
-import { CreateEditTripModal } from "../me/CreateEditTripModal";
 import { deleteTrip } from "@/src/service/tripService";
 import { ConfirmDialog } from "../common/ConfirmDialog";
 import { IconActionButton } from "../common/IconActionButton";
@@ -31,7 +30,6 @@ export const TripHeader = ({
 }) => {
   const router = useRouter();
   const { data: session } = useSession();
-  const [isEditTripModalOpen, setIsEditTripModalOpen] = useState(false);
   const [isDeleteTripModalOpen, setIsDeleteTripModalOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -84,7 +82,7 @@ export const TripHeader = ({
           {isOwnTrip && (
             <IconActionButton
               ariaLabel="Edit trip"
-              onClick={() => setIsEditTripModalOpen(true)}
+              href={`/me/trip/${tripId}/edit`}
             >
               <Settings />
             </IconActionButton>
@@ -140,23 +138,6 @@ export const TripHeader = ({
           </Link>
         </div>
       </div>
-
-      <CreateEditTripModal
-        open={isEditTripModalOpen}
-        onOpenChange={setIsEditTripModalOpen}
-        mode="edit"
-        tripId={tripId}
-        initialValues={{
-          title,
-          city,
-          country,
-          startDate,
-          endDate,
-          approximateCost,
-          currency,
-          notes: trip.notes,
-        }}
-      />
 
       <ConfirmDialog
         open={isDeleteTripModalOpen}

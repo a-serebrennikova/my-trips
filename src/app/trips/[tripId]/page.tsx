@@ -45,7 +45,7 @@ export default async function TripDetailPage({
     <>
       <TripHeader trip={trip} tripId={tripId} />
       <Tabs.Root defaultValue="overview" className="flex flex-col flex-1">
-        <Tabs.List aria-label="Trip content tabs" className="mx-6" >
+        <Tabs.List aria-label="Trip content tabs" className="mx-6">
           {tabs.map((tab) => (
             <Tabs.Trigger key={tab.id} value={tab.id}>
               {tab.title}
@@ -53,10 +53,23 @@ export default async function TripDetailPage({
           ))}
         </Tabs.List>
         <Tabs.Content value="overview" className="flex flex-col flex-1">
-          <Card className="flex-1 gap-4">
-            <div className="flex flex-col lg:flex-row gap-4">
-              <NotesBlock notes={notes} />
-              <Flex direction="column" gap="4" className="w-full">
+          <Card className="flex-1 gap-8">
+            {notes && <NotesBlock notes={notes} />}
+            <div className="flex max-sm:flex-col flex-1 gap-6">
+              <div className="basis-1/2 max-sm:w-full">
+                {photos?.length ? (
+                  <Carousel slides={photos.map((photo) => photo.url)} />
+                ) : (
+                  <div className="flex flex-col flex-1 w-full min-h-60">
+                    <NoPhoto />
+                  </div>
+                )}
+              </div>
+              <Flex
+                direction="column"
+                gap="4"
+                className="basis-1/2 max-sm:w-full"
+              >
                 <CommentsBlock
                   comments={comments}
                   tripId={tripId}
@@ -64,15 +77,6 @@ export default async function TripDetailPage({
                 />
               </Flex>
             </div>
-            <Flex flexGrow="1">
-              {photos?.length ? (
-                <Carousel slides={photos} options={{ loop: true }} />
-              ) : (
-                <div className="flex flex-col flex-1 w-full min-h-60">
-                  <NoPhoto />
-                </div>
-              )}
-            </Flex>
           </Card>
         </Tabs.Content>
         <Tabs.Content value="cafes" className="flex flex-col flex-1">
