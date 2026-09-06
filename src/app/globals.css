@@ -97,8 +97,12 @@
 }
 
 body {
-  background: #f1fffd;
   font-family: var(--font-sans);
+}
+
+.photo-upload-add-button:disabled:hover {
+  background-color: var(--gray-a3) !important;
+  color: var(--gray-11) !important;
 }
 
 .pill {
@@ -131,6 +135,25 @@ body {
   font-size: 0.875rem;
   line-height: 1.4;
   font-weight: 500;
+}
+
+.photo-upload-card {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  border: 1px solid var(--border);
+  border-radius: 0.375rem;
+  background: #ffffff;
+  padding: 0.5rem;
+}
+
+.photo-upload-preview {
+  width: 2.5rem;
+  height: 2.5rem;
+  flex-shrink: 0;
+  border: 1px solid var(--border);
+  border-radius: 0.25rem;
+  object-fit: cover;
 }
 
 .card-title {
@@ -246,34 +269,37 @@ body {
   opacity: 1;
 }
 
-/* Notification Center Styles */
-
-/* Embla Carousel Styles */
-
 .embla {
-  max-width: 48rem;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  height: 100%;
+  width: 100%;
+  max-width: 100%;
   margin: auto;
 
   --slide-height: 19rem;
   --slide-spacing: 1rem;
-  --slide-size: 70%;
+  --slide-size: 100%;
 }
 
 .embla__viewport {
+  flex: 1;
+  min-height: 0;
   overflow: hidden;
 }
 
 .embla__container {
   display: flex;
+  height: 100%;
   touch-action: pan-y pinch-zoom;
-  margin-left: calc(var(--slide-spacing) * -1);
 }
 
 .embla__slide {
   transform: translate3d(0, 0, 0);
   flex: 0 0 var(--slide-size);
   min-width: 0;
-  padding-left: var(--slide-spacing);
+  height: 100%;
 }
 
 .embla__slide__number {
@@ -284,16 +310,19 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: var(--slide-height);
+  width: 100%;
+  height: 100%;
+  min-height: var(--slide-height);
   user-select: none;
 }
 
 .embla__controls {
   display: flex;
+  flex-shrink: 0;
   justify-content: center;
   align-items: center;
   gap: 1.2rem;
-  margin-top: 1rem;
+  margin-top: 0.5rem;
 }
 
 .embla__buttons {
@@ -312,8 +341,8 @@ body {
   padding: 0;
   margin: 0;
   border: 0.2rem solid var(--detail-medium-contrast);
-  width: 3.6rem;
-  height: 3.6rem;
+  width: 2.5rem;
+  height: 2.5rem;
   z-index: 1;
   border-radius: 50%;
   align-items: center;
@@ -323,11 +352,12 @@ body {
 
 .embla__button--disabled {
   color: var(--detail-high-contrast);
+  cursor: default;
+  opacity: 0.45;
+  pointer-events: none;
 }
 
 .embla__button__svg {
   width: 35%;
   height: 35%;
 }
-
-/* Embla Carousel Styles */

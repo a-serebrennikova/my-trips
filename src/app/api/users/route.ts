@@ -1,5 +1,3 @@
-import { v2 as cloudinary } from "cloudinary";
-
 import { NextResponse } from "next/server";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { getCurrentUserId } from "@/src/auth/session";
@@ -10,6 +8,7 @@ import {
   buildProfileUpdateFromRecord,
   isRecord,
 } from "@/src/service/profileService";
+import { uploadImageToCloudinary } from "@/src/service/cloudinary";
 
 export async function GET() {
   try {
@@ -26,72 +25,6 @@ export async function GET() {
       { status: 500 },
     );
   }
-}
-
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
-
-export async function uploadAvatarToCloudinary(
-  file: File,
-): Promise<string | null> {
-  const timestamp = Math.floor(Date.now() / 1000);
-  const publicId = crypto.randomUUID();
-
-  const signature = cloudinary.utils.api_sign_request(
-    { folder: "avatars", public_id: publicId, timestamp },
-    process.env.CLOUDINARY_API_SECRET || "",
-  );
-
-  const formData = new FormData();
-  formData.append("file", file);
-  formData.append("api_key", process.env.CLOUDINARY_API_KEY || "");
-  formData.append("timestamp", String(timestamp));
-  formData.append("signature", signature);
-  formData.append("folder", "avatars");
-  formData.append("public_id", publicId);
-
-  let response: Response;
-
-  try {
-    response = await fetch(
-      `https://api.cloudinary.com/v1_1/${process.env.CLOUDINARY_CLOUD_NAME}/image/upload`,
-      {
-        method: "POST",
-        body: formData,
-      },
-    );
-  } catch (error) {
-    console.error("[Cloudinary upload] network error:", error);
-    throw new Error(
-      `Cloudinary network error: ${error instanceof Error ? error.message : "Unknown fetch error"}`,
-    );
-  }
-
-  const responseText = await response.text();
-
-  if (!response.ok) {
-    console.error("[Cloudinary upload] failed response:", {
-      status: response.status,
-      statusText: response.statusText,
-      body: responseText,
-    });
-    throw new Error(
-      `Failed to upload avatar to Cloudinary. Status: ${response.status}. Details: ${responseText}`,
-    );
-  }
-
-  let result: { secure_url?: string };
-  try {
-    result = JSON.parse(responseText) as { secure_url?: string };
-  } catch {
-    console.error("[Cloudinary upload] invalid JSON response:", responseText);
-    throw new Error("Cloudinary returned invalid JSON.");
-  }
-
-  return result.secure_url ?? null;
 }
 
 export async function PATCH(request: Request) {
@@ -126,16 +59,11 @@ export async function PATCH(request: Request) {
           );
         }
 
-        const avatarUrl = await uploadAvatarToCloudinary(file);
+        const uploadedAvatar = await uploadImageToCloudinary(file, {
+          folder: "avatars",
+        });
 
-        if (!avatarUrl) {
-          return NextResponse.json(
-            { error: "Cloudinary returned no avatar URL." },
-            { status: 500 },
-          );
-        }
-
-        profileUpdate.avatarUrl = avatarUrl;
+        profileUpdate.avatarUrl = uploadedAvatar.url;
       }
     } else {
       const body = await request.json().catch(() => null);

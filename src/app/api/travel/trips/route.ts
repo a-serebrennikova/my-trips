@@ -1,12 +1,13 @@
 export const runtime = "nodejs";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 import { createTrip, getAllTravelData } from "@/src/db/trips";
 import { getCurrentUserId } from "@/src/auth/session";
 import {
   calculateTripDays,
   normalizeNotes,
-  tripFormSchema,
+  tripStepFormSchema,
+  validateUploadedPhotoOwnership,
 } from "@/src/schemas/tripForm";
 
 export async function GET(request: Request) {
@@ -38,7 +39,7 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const result = tripFormSchema.safeParse(body);
+    const result = tripStepFormSchema.safeParse(body);
 
     if (!result.success) {
       return NextResponse.json(
@@ -46,6 +47,22 @@ export async function POST(request: Request) {
           error: "Validation error",
           details: result.error.flatten(),
         },
+        { status: 400 },
+      );
+    }
+
+    const photos = [
+      ...result.data.tripPhotos,
+      ...result.data.attractions.flatMap((place) => place.photos),
+      ...result.data.cafes.flatMap((place) => place.photos),
+    ];
+    if (
+      photos.some(
+        (photo) => !validateUploadedPhotoOwnership(photo, currentUserId),
+      )
+    ) {
+      return NextResponse.json(
+        { error: "Invalid photo ownership" },
         { status: 400 },
       );
     }
@@ -68,13 +85,16 @@ export async function POST(request: Request) {
       approximateCost: result.data.approximateCost,
       currency: result.data.currency,
       notes: normalizeNotes(result.data.notes) ?? undefined,
-      attractions: [],
-      cafes: [],
+      attractions: result.data.attractions,
+      cafes: result.data.cafes,
+      tripPhotos: result.data.tripPhotos,
     });
 
     revalidatePath("/");
     revalidatePath("/trips");
     revalidatePath("/me");
+    revalidateTag("all-travel-data", "default");
+    revalidateTag("trip-by-id", "default");
 
     return NextResponse.json(trip, { status: 201 });
   } catch (error) {

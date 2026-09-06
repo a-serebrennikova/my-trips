@@ -1,13 +1,15 @@
 import { randomUUID } from "node:crypto";
 import type { PoolClient } from "pg";
 import { unstable_cache } from "next/cache";
-import type { Comment, Place, Trip, User } from "@/src/types";
+import type { Comment, Trip, User } from "@/src/types";
 import { query, withTransaction } from "./client";
+import { destroyCloudinaryImage } from "@/src/service/cloudinary";
 import {
   groupByTripId,
   mapDbTripToTrip,
   mapDbTripToTripPreview,
   mapDbUserToUser,
+  mapDbPhotosToPhotos,
 } from "./mappers";
 import {
   type DbFriendProfileStatsRow,
@@ -19,6 +21,7 @@ import {
 import {
   type DbCommentWithAuthor,
   type DbPlace,
+  type DbPhoto,
   type DbTrip,
   type DbTripLike,
   type DbTripWithAuthor,
@@ -54,14 +57,59 @@ async function loadTripsByQuery(
     ),
   ]);
 
+  const placeIds = placesResult.rows.map((place) => place.id);
+  const photosResult =
+    placeIds.length > 0
+      ? await query<DbPhoto>(
+          `SELECT id, trip_id, place_id, url, public_id, format, bytes, width, height, sort_order
+           FROM photos
+           WHERE trip_id = ANY($1::text[])
+              OR place_id = ANY($2::text[])
+           ORDER BY sort_order ASC`,
+          [tripIds, placeIds],
+        )
+      : await query<DbPhoto>(
+          `SELECT id, trip_id, place_id, url, public_id, format, bytes, width, height, sort_order
+           FROM photos
+           WHERE trip_id = ANY($1::text[])
+           ORDER BY sort_order ASC`,
+          [tripIds],
+        );
+
   const placesByTripId = groupByTripId(placesResult.rows);
   const commentsByTripId = groupByTripId(commentsResult.rows);
   const likesByTripId = groupByTripId(likesResult.rows);
+  const photosByPlaceId = new Map<
+    string,
+    ReturnType<typeof mapDbPhotosToPhotos>
+  >();
+  const dbPhotosByPlaceId = new Map<string, DbPhoto[]>();
+  const tripPhotosByTripId = new Map<string, DbPhoto[]>();
+
+  for (const photo of photosResult.rows) {
+    if (photo.place_id) {
+      const placePhotos = dbPhotosByPlaceId.get(photo.place_id) ?? [];
+      placePhotos.push(photo);
+      dbPhotosByPlaceId.set(photo.place_id, placePhotos);
+    }
+
+    if (photo.trip_id) {
+      const tripPhotos = tripPhotosByTripId.get(photo.trip_id) ?? [];
+      tripPhotos.push(photo);
+      tripPhotosByTripId.set(photo.trip_id, tripPhotos);
+    }
+  }
+
+  for (const [placeId, photos] of dbPhotosByPlaceId) {
+    photosByPlaceId.set(placeId, mapDbPhotosToPhotos(photos));
+  }
 
   return trips.map((trip) => {
     const tripId = trip.id;
     return mapDbTripToTrip(trip, {
       places: placesByTripId.get(tripId) ?? [],
+      tripPhotos: tripPhotosByTripId.get(tripId) ?? [],
+      photosByPlaceId,
       comments: commentsByTripId.get(tripId) ?? [],
       likes: likesByTripId.get(tripId) ?? [],
     });
@@ -92,24 +140,263 @@ async function loadTripPreviewsByQuery(
   });
 }
 
+type TripPlaceWriteInput = {
+  id?: string;
+  name: string;
+  city?: string;
+  note?: string;
+  sortOrder: number;
+  photos: TripPhotoWriteInput[];
+};
+
+type TripPhotoWriteInput = {
+  id: string;
+  url: string;
+  publicId: string;
+  format: string;
+  bytes: number;
+  width: number;
+  height: number;
+  sortOrder: number;
+};
+
+async function insertTripPhotos(
+  client: PoolClient,
+  tripId: string,
+  photos: TripPhotoWriteInput[],
+) {
+  for (const photo of photos) {
+    await client.query(
+      `INSERT INTO photos
+       (id, trip_id, url, public_id, format, bytes, width, height, sort_order)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
+      [
+        photo.id,
+        tripId,
+        photo.url,
+        photo.publicId,
+        photo.format,
+        photo.bytes,
+        photo.width,
+        photo.height,
+        photo.sortOrder,
+      ],
+    );
+  }
+}
+
+async function insertPlacePhotos(
+  client: PoolClient,
+  placeId: string,
+  photos: TripPhotoWriteInput[],
+) {
+  for (const photo of photos) {
+    await client.query(
+      `INSERT INTO photos
+       (id, place_id, url, public_id, format, bytes, width, height, sort_order)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
+      [
+        photo.id,
+        placeId,
+        photo.url,
+        photo.publicId,
+        photo.format,
+        photo.bytes,
+        photo.width,
+        photo.height,
+        photo.sortOrder,
+      ],
+    );
+  }
+}
+
+async function syncPhotos(
+  client: PoolClient,
+  ownerColumn: "trip_id" | "place_id",
+  ownerId: string,
+  photos: TripPhotoWriteInput[],
+  deletedPublicIds: string[],
+) {
+  const existingResult = await client.query<{ id: string; public_id: string }>(
+    `SELECT id, public_id FROM photos WHERE ${ownerColumn} = $1`,
+    [ownerId],
+  );
+  const existing = new Map(
+    existingResult.rows.map((photo) => [photo.id, photo.public_id]),
+  );
+  const incomingIds = new Set(photos.map((photo) => photo.id));
+
+  for (const photo of photos) {
+    if (existing.has(photo.id)) {
+      await client.query(
+        `UPDATE photos
+         SET url = $1, public_id = $2, format = $3, bytes = $4,
+             width = $5, height = $6, sort_order = $7
+         WHERE id = $8 AND ${ownerColumn} = $9`,
+        [
+          photo.url,
+          photo.publicId,
+          photo.format,
+          photo.bytes,
+          photo.width,
+          photo.height,
+          photo.sortOrder,
+          photo.id,
+          ownerId,
+        ],
+      );
+    } else {
+      const foreignResult = await client.query<{ id: string }>(
+        `SELECT id FROM photos WHERE id = $1 LIMIT 1`,
+        [photo.id],
+      );
+      if (foreignResult.rows[0]) {
+        throw new Error(`Photo ${photo.id} does not belong to ${ownerColumn}`);
+      }
+
+      await client.query(
+        `INSERT INTO photos
+         (id, ${ownerColumn}, url, public_id, format, bytes, width, height, sort_order)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
+        [
+          photo.id,
+          ownerId,
+          photo.url,
+          photo.publicId,
+          photo.format,
+          photo.bytes,
+          photo.width,
+          photo.height,
+          photo.sortOrder,
+        ],
+      );
+    }
+  }
+
+  for (const [photoId, publicId] of existing) {
+    if (!incomingIds.has(photoId)) {
+      deletedPublicIds.push(publicId);
+      await client.query(`DELETE FROM photos WHERE id = $1`, [photoId]);
+    }
+  }
+}
+
 async function insertPlaces(
   client: PoolClient,
   tripId: string,
   cityFallback: string,
-  places: Array<Place & { type: "attraction" | "cafe" }>,
+  places: Array<TripPlaceWriteInput & { type: "attraction" | "cafe" }>,
 ) {
   for (const place of places) {
+    const placeId = place.id || randomUUID();
     await client.query(
-      `INSERT INTO places (id, trip_id, name, city, note, type) VALUES ($1, $2, $3, $4, $5, $6)`,
+      `INSERT INTO places (id, trip_id, name, city, note, type, sort_order) VALUES ($1, $2, $3, $4, $5, $6, $7)`,
       [
-        place.id || randomUUID(),
+        placeId,
         tripId,
         place.name,
         place.city || cityFallback,
         place.note ?? null,
         place.type,
+        place.sortOrder,
       ],
     );
+    await insertPlacePhotos(client, placeId, place.photos);
+  }
+}
+
+async function syncPlaces(
+  client: PoolClient,
+  tripId: string,
+  cityFallback: string,
+  type: "attraction" | "cafe",
+  places: TripPlaceWriteInput[],
+  deletedPublicIds: string[],
+) {
+  const existingResult = await client.query<{ id: string; type: string }>(
+    `SELECT id, type FROM places WHERE trip_id = $1`,
+    [tripId],
+  );
+  const existingPlaces = new Map(
+    existingResult.rows.map((place) => [place.id, place]),
+  );
+  const existingIds = new Set(
+    existingResult.rows
+      .filter((place) => place.type === type)
+      .map((place) => place.id),
+  );
+  const incomingIds = new Set<string>();
+
+  for (const [sortOrder, place] of places.entries()) {
+    const placeId = place.id || randomUUID();
+    incomingIds.add(placeId);
+
+    if (place.id && !existingPlaces.has(place.id)) {
+      const foreignPlace = await client.query<{ trip_id: string }>(
+        `SELECT trip_id FROM places WHERE id = $1 LIMIT 1`,
+        [place.id],
+      );
+
+      if (foreignPlace.rows[0] && foreignPlace.rows[0].trip_id !== tripId) {
+        throw new Error(`Place ${place.id} does not belong to trip`);
+      }
+    }
+
+    if (existingPlaces.has(placeId)) {
+      await client.query(
+        `UPDATE places
+         SET name = $1, city = $2, note = $3, type = $4, sort_order = $5
+         WHERE id = $6 AND trip_id = $7`,
+        [
+          place.name,
+          place.city || cityFallback,
+          place.note ?? null,
+          type,
+          sortOrder,
+          placeId,
+          tripId,
+        ],
+      );
+    } else {
+      await client.query(
+        `INSERT INTO places
+         (id, trip_id, name, city, note, type, sort_order)
+         VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+        [
+          placeId,
+          tripId,
+          place.name,
+          place.city || cityFallback,
+          place.note ?? null,
+          type,
+          sortOrder,
+        ],
+      );
+    }
+
+    await syncPhotos(
+      client,
+      "place_id",
+      placeId,
+      place.photos,
+      deletedPublicIds,
+    );
+  }
+
+  for (const existingId of existingIds) {
+    if (!incomingIds.has(existingId)) {
+      const deletedPhotos = await client.query<{ public_id: string }>(
+        `SELECT public_id FROM photos WHERE place_id = $1`,
+        [existingId],
+      );
+      deletedPublicIds.push(
+        ...deletedPhotos.rows.map((photo) => photo.public_id),
+      );
+      await client.query(
+        `DELETE FROM places WHERE id = $1 AND trip_id = $2 AND type = $3`,
+        [existingId, tripId, type],
+      );
+    }
   }
 }
 
@@ -123,9 +410,21 @@ type TripWriteInput = {
   approximateCost: number;
   currency: Trip["currency"];
   notes?: string;
-  attractions: Place[];
-  cafes: Place[];
+  attractions: TripPlaceWriteInput[];
+  cafes: TripPlaceWriteInput[];
+  tripPhotos: TripPhotoWriteInput[];
 };
+
+type TripUpdateInput = Omit<
+  TripWriteInput,
+  "attractions" | "cafes" | "days" | "notes"
+> &
+  Partial<Pick<TripWriteInput, "days">> & {
+    notes?: string | null;
+    attractions?: TripPlaceWriteInput[];
+    cafes?: TripPlaceWriteInput[];
+    tripPhotos?: TripPhotoWriteInput[];
+  };
 
 export async function getUserTravelData(
   userId: string,
@@ -332,6 +631,7 @@ export async function createTrip(
     }));
     const cafes = input.cafes.map((p) => ({ ...p, type: "cafe" as const }));
     await insertPlaces(client, tripId, input.city, [...attractions, ...cafes]);
+    await insertTripPhotos(client, tripId, input.tripPhotos);
   });
 
   const trip = await getTripByIdRaw(tripId);
@@ -341,13 +641,15 @@ export async function createTrip(
 
 export async function updateTrip(
   tripId: string,
-  patch: Partial<Trip>,
+  patch: TripUpdateInput,
 ): Promise<Trip | null> {
   const existing = await query<DbTrip>(
     `SELECT id, city FROM trips WHERE id = $1 LIMIT 1`,
     [tripId],
   );
   if (!existing.rows[0]) return null;
+
+  const deletedPublicIds: string[] = [];
 
   await withTransaction(async (client) => {
     const updates: string[] = [];
@@ -380,28 +682,60 @@ export async function updateTrip(
     }
 
     if (patch.attractions != null || patch.cafes != null) {
-      await client.query(`DELETE FROM places WHERE trip_id = $1`, [tripId]);
       const cityFallback = patch.city ?? existing.rows[0].city;
-      const attractions = (patch.attractions ?? []).map((p) => ({
-        ...p,
-        type: "attraction" as const,
-      }));
-      const cafes = (patch.cafes ?? []).map((p) => ({
-        ...p,
-        type: "cafe" as const,
-      }));
-      await insertPlaces(client, tripId, cityFallback, [
-        ...attractions,
-        ...cafes,
-      ]);
+
+      if (patch.attractions != null) {
+        await syncPlaces(
+          client,
+          tripId,
+          cityFallback,
+          "attraction",
+          patch.attractions,
+          deletedPublicIds,
+        );
+      }
+
+      if (patch.cafes != null) {
+        await syncPlaces(
+          client,
+          tripId,
+          cityFallback,
+          "cafe",
+          patch.cafes,
+          deletedPublicIds,
+        );
+      }
+    }
+
+    if (patch.tripPhotos) {
+      await syncPhotos(
+        client,
+        "trip_id",
+        tripId,
+        patch.tripPhotos,
+        deletedPublicIds,
+      );
     }
   });
+
+  await Promise.all(deletedPublicIds.map(destroyCloudinaryImage));
 
   return (await getTripByIdRaw(tripId)) ?? null;
 }
 
 export async function deleteTrip(tripId: string): Promise<boolean> {
-  return await withTransaction(async (client) => {
+  const deletedPublicIds: string[] = [];
+
+  const deleted = await withTransaction(async (client) => {
+    const photosResult = await client.query<{ public_id: string }>(
+      `SELECT p.public_id
+       FROM photos p
+       LEFT JOIN places pl ON pl.id = p.place_id
+       WHERE p.trip_id = $1 OR pl.trip_id = $1`,
+      [tripId],
+    );
+    deletedPublicIds.push(...photosResult.rows.map((photo) => photo.public_id));
+
     await client.query(`DELETE FROM trip_likes WHERE trip_id = $1`, [tripId]);
     await client.query(`DELETE FROM comments WHERE trip_id = $1`, [tripId]);
     await client.query(`DELETE FROM places WHERE trip_id = $1`, [tripId]);
@@ -413,6 +747,12 @@ export async function deleteTrip(tripId: string): Promise<boolean> {
 
     return (result.rowCount ?? 0) > 0;
   });
+
+  if (deleted) {
+    await Promise.all(deletedPublicIds.map(destroyCloudinaryImage));
+  }
+
+  return deleted;
 }
 
 export async function createComment(

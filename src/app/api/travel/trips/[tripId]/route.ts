@@ -1,12 +1,13 @@
 export const runtime = "nodejs";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 import { deleteTrip, getTripById, updateTrip } from "@/src/db/trips";
 import { getCurrentUserId } from "@/src/auth/session";
 import {
   calculateTripDays,
   normalizeNotes,
-  tripFormSchema,
+  tripStepFormSchema,
+  validateUploadedPhotoOwnership,
 } from "@/src/schemas/tripForm";
 
 export async function GET(
@@ -55,7 +56,7 @@ export async function PATCH(
     }
 
     const body = await request.json();
-    const result = tripFormSchema.safeParse(body);
+    const result = tripStepFormSchema.safeParse(body);
 
     if (!result.success) {
       return NextResponse.json(
@@ -63,6 +64,22 @@ export async function PATCH(
           error: "Validation error",
           details: result.error.flatten(),
         },
+        { status: 400 },
+      );
+    }
+
+    const photos = [
+      ...result.data.tripPhotos,
+      ...result.data.attractions.flatMap((place) => place.photos),
+      ...result.data.cafes.flatMap((place) => place.photos),
+    ];
+    if (
+      photos.some(
+        (photo) => !validateUploadedPhotoOwnership(photo, currentUserId),
+      )
+    ) {
+      return NextResponse.json(
+        { error: "Invalid photo ownership" },
         { status: 400 },
       );
     }
@@ -84,7 +101,10 @@ export async function PATCH(
       days,
       approximateCost: result.data.approximateCost,
       currency: result.data.currency,
-      notes: normalizeNotes(result.data.notes) ?? undefined,
+      notes: normalizeNotes(result.data.notes),
+      attractions: result.data.attractions,
+      cafes: result.data.cafes,
+      tripPhotos: result.data.tripPhotos,
     });
 
     if (!updatedTrip) {
@@ -95,6 +115,8 @@ export async function PATCH(
     revalidatePath("/trips");
     revalidatePath(`/trips/${tripId}`);
     revalidatePath("/me");
+    revalidateTag("all-travel-data", "default");
+    revalidateTag("trip-by-id", "default");
 
     return NextResponse.json(updatedTrip);
   } catch (error) {
@@ -141,6 +163,8 @@ export async function DELETE(
     revalidatePath("/users");
     revalidatePath(`/users/${existingTrip.userId}`);
     revalidatePath("/me");
+    revalidateTag("all-travel-data", "default");
+    revalidateTag("trip-by-id", "default");
 
     return NextResponse.json({ deleted: true });
   } catch (error) {

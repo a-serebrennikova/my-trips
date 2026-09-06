@@ -27,6 +27,19 @@ export type DbPlace = {
   type: string;
 };
 
+export type DbPhoto = {
+  id: string;
+  trip_id: string | null;
+  place_id: string | null;
+  url: string;
+  sort_order: number;
+  public_id: string;
+  format: string;
+  bytes: number;
+  width: number;
+  height: number;
+};
+
 export type DbComment = {
   id: string;
   trip_id: string;

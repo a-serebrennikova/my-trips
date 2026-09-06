@@ -12,7 +12,6 @@ interface IProps {
 
 export const PlaceBlock: React.FC<IProps> = ({ places, noDataText }) => {
   return (
-    // bg-(--orange-a3)
     <Card className="flex-1">
       <Flex direction="column" gap="3" className="w-full h-full">
         <Flex
@@ -24,11 +23,15 @@ export const PlaceBlock: React.FC<IProps> = ({ places, noDataText }) => {
         >
           {places.length ? (
             places.map(({ id, name, note, photos }) => {
+              const slidePhotos = photos
+                ?.sort((a, b) => a.sortOrder - b.sortOrder)
+                .map((photo) => photo.url);
+
               return (
                 <Flex
                   key={id}
                   direction="column"
-                  flexGrow='1'
+                  flexGrow="1"
                   className="w-full min-h-60"
                   gap="3"
                 >
@@ -37,7 +40,10 @@ export const PlaceBlock: React.FC<IProps> = ({ places, noDataText }) => {
                   </Badge>
                   <p className="text-standard">{note}</p>
                   {photos?.length ? (
-                    <Carousel slides={photos} options={{ loop: true }} />
+                    <Carousel
+                      slides={slidePhotos}
+                      options={{ loop: true }}
+                    />
                   ) : (
                     <div className="flex flex-col flex-1 w-full">
                       <NoPhoto />

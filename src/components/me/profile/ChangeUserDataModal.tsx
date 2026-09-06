@@ -11,12 +11,12 @@ import { useForm } from "react-hook-form";
 import {
   notifyError,
   notifySuccess,
-} from "../common/Notification/notificationBus";
-import { ErrorText } from "../common/ErrorText";
+} from "@/src/components/common/Notification/notificationBus";
+import { ErrorText } from "@/src/components/common/ErrorText";
 import {
   ProfileFormValues,
   profileFormSchema,
-} from "../../schemas/profileSchema";
+} from "@/src/schemas/profileSchema";
 
 import { UploadAvatar } from "./components/UploadAvatar";
 

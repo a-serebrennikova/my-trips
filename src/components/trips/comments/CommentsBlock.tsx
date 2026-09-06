@@ -1,7 +1,6 @@
 "use client";
 
 import { Avatar, Flex } from "@radix-ui/themes";
-import { Card } from "../../common/Card";
 import { getNameLetter } from "@/src/utils/getNameLetter";
 import type { Comment } from "@/src/types";
 import { CreateComment } from "./CreateComment";
@@ -28,12 +27,12 @@ export const CommentsBlock = ({
 
   if (!comments.length && !currentUserId) {
     return (
-      <Card className="gap-2 bg-(--orange-a3)">
+      <div className='flex flex-col flex-1 gap-2'>
         <p className="card-title">Comments:</p>
         <Flex direction="column" className="justify-center items-center">
           <p className="text-standard">No comments yet.</p>
         </Flex>
-      </Card>
+      </div>
     );
   }
 
@@ -48,7 +47,7 @@ export const CommentsBlock = ({
   };
 
   return (
-    <Card className="gap-2 bg-(--orange-a3)">
+     <div className='flex flex-col flex-1 gap-2'>
       <p className="card-title">Comments:</p>
       {comments.map(({ id, author, message }) => (
         <Flex key={id} gap="2" align="center" className="w-full">
@@ -76,6 +75,6 @@ export const CommentsBlock = ({
         </Flex>
       ))}
       {!!currentUserId && <CreateComment tripId={tripId} />}
-    </Card>
+    </div>
   );
 };

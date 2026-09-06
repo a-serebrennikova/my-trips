@@ -55,7 +55,7 @@ const AuthorInfo = ({ author }: { author: User }) => (
 );
 
 export const TripCardItem = ({ trip, author }: TripCardItemProps) => (
-  <article className="w-full flex flex-col flex-1 rounded-2xl border border-teal-100/80 bg-white p-4 sm:p-5">
+  <article className="w-full flex flex-col flex-1">
     <Link
       href={`/trips/${trip.id}`}
       className="flex flex-1 flex-col justify-between"

@@ -11,7 +11,11 @@ type PropType = {
 };
 
 const Carousel = ({ slides, options }: PropType) => {
-  const [emblaRef, emblaApi] = useEmblaCarousel(options);
+  const [emblaRef, emblaApi] = useEmblaCarousel({
+    align: "center",
+    loop: false,
+    ...options,
+  });
 
   const {
     prevBtnDisabled,
@@ -19,6 +23,7 @@ const Carousel = ({ slides, options }: PropType) => {
     onPrevButtonClick,
     onNextButtonClick,
   } = usePrevNextButtons(emblaApi);
+  const hasScrollableSlides = slides.length > 1;
 
   return (
     <div className="embla">
@@ -31,8 +36,8 @@ const Carousel = ({ slides, options }: PropType) => {
                   width={300}
                   height={300}
                   src={slide}
-                  alt={`Slide ${index + 1}`}
-                  className="object-contain"
+                  alt={`Photo ${index + 1}`}
+                  className="h-full w-full object-contain"
                 />
               </div>
             </div>
@@ -42,8 +47,14 @@ const Carousel = ({ slides, options }: PropType) => {
 
       <div className="embla__controls">
         <div className="embla__buttons">
-          <PrevButton onClick={onPrevButtonClick} disabled={prevBtnDisabled} />
-          <NextButton onClick={onNextButtonClick} disabled={nextBtnDisabled} />
+          <PrevButton
+            onClick={onPrevButtonClick}
+            disabled={!hasScrollableSlides || prevBtnDisabled}
+          />
+          <NextButton
+            onClick={onNextButtonClick}
+            disabled={!hasScrollableSlides || nextBtnDisabled}
+          />
         </div>
       </div>
     </div>

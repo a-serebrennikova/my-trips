@@ -583,13 +583,6 @@ function FileUpload(props: FileUploadProps) {
       if (acceptedFiles.length > 0) {
         store.dispatch({ type: "ADD_FILES", files: acceptedFiles });
 
-        if (isControlled && propsRef.current.onValueChange) {
-          const currentFiles = Array.from(store.getState().files.values()).map(
-            (f) => f.file,
-          );
-          propsRef.current.onValueChange([...currentFiles]);
-        }
-
         if (propsRef.current.onAccept) {
           propsRef.current.onAccept(acceptedFiles);
         }
@@ -607,7 +600,6 @@ function FileUpload(props: FileUploadProps) {
     },
     [
       store,
-      isControlled,
       propsRef,
       onFilesUpload,
       maxFiles,
